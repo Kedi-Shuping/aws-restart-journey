@@ -2,7 +2,7 @@
 
 This folder contains my Linux labs completed during the AWS re/Start programme.
 
-## Topics Covered:
+## Topics covered:
 
 - Introduction to Linux
 - Linux Command Line
