@@ -2,7 +2,7 @@
 
 Welcome to my AWS Cloud Engineering portfolio.
 
-This repository documents my hands-on labs, projects, notes, and learning journey throughout the AWS re/Start program.
+This repository documents my hands-on labs, projects, notes, and continuous learning throughout the AWS re/Start programme. It serves as a portfolio demonstrating my practical cloud engineering skills and technical growth.
 
 ---
 
@@ -26,17 +26,22 @@ When I encounter challenges, I research AWS documentation and other technical re
 
 ##  Technologies & Services
 
-- Amazon EC2
-- Amazon S3
-- AWS Lambda
-- Amazon DynamoDB
-- Amazon VPC
-- IAM
-- Route 53
-- Linux
-- Bash
-- Python
-- GitHub
+AWS Services
+
+Amazon EC2
+Amazon S3
+AWS Lambda
+Amazon DynamoDB
+Amazon VPC
+IAM
+Route 53
+
+Operating Systems & Scripting
+
+Linux
+Bash
+Python
+
 
 ---
 
