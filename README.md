@@ -28,15 +28,17 @@ When I encounter challenges, I research AWS documentation and other technical re
 
 ### AWS Services
 
-- Amazon EC2
-- Amazon S3
-- AWS Lambda
-- Amazon DynamoDB
-- Amazon VPC
-- IAM
-- Amazon Route 53
+• Amazon EC2
+• Amazon S3
+• AWS Lambda
+• Amazon DynamoDB
+• Amazon VPC
+• AWS Identity Access Management (IAM)
+• Amazon Route 53
+• Amazon Elastic Block Store (EBS)
+• Amazon Elastic File System (EFS)
 
-### Operating Systems & Scripting
+### Operating Systems & Programming
 
 - Linux
 - Bash
