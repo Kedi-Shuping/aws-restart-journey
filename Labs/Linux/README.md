@@ -2,7 +2,7 @@
 
 This folder contains my Linux labs completed during the AWS re/Start programme.
 
-Topics Covered:
+## Topics Covered:
 
 - Introduction to Linux
 - Linux Command Line
@@ -15,9 +15,9 @@ Topics Covered:
 - Managing Processes
 - Managing Log Files
 
-What you'll find in each Lab
+## What you'll find in each lab
 
-- A brief overview
+- Brief overview
 - Skills demonstrated
 - Linux commands used
 - Screenshots (where available)
