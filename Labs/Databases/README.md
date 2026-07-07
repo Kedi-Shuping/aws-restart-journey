@@ -20,4 +20,5 @@ This folder contains my database labs completed during the AWS re/Start programm
 - Database concepts explored
 - Architecture diagrams (where applicable)
 - Screenshots (where available)
-- Key lessons learned
+- Key lessons learned.
+  
