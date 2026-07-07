@@ -24,12 +24,19 @@ This lab focused on creating and managing Amazon Elastic Block Store (EBS) volum
 - Volume attachment
 - Availability Zone limitations
 
+## Real-World Use Cases
+
+- Storing operating systems for EC2 instances
+- Hosting application and database files
+- Persistent storage for web servers
+- Supporting applications that require durable block storage
+
 ## Screenshots
 
 Screenshots of the lab will be added here.
 
 ## Key Takeaways
 
-- EBS volumes persist independently of the EC2 instance.
-- An EBS volume can be detached and attached to another EC2 instance within the same Availability Zone.
-- EBS is suitable for operating systems, applications, and databases that require persistent storage.
+- Amazon EBS provides persistent block storage.
+- Volumes remain available after an EC2 instance is stopped.
+- EBS volumes can be detached and attached to another EC2 instance within the same Availability Zone.
