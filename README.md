@@ -16,6 +16,14 @@ My goal is to continue learning, earn AWS certifications, and build secure, scal
 
 ---
 
+My Learning Approach
+
+Throughout the AWS re/Start programme, I focus on understanding how AWS services work together rather than simply completing labs. I enjoy exploring the architecture behind cloud solutions and documenting what I learn through hands-on practice.
+
+When I encounter challenges, I research AWS documentation and other technical resources to deepen my understanding and troubleshoot problems independently. Each lab in this portfolio is documented with the AWS services used, the skills demonstrated, and the key lessons I learned.
+
+---
+
 ##  Technologies & Services
 
 - Amazon EC2
@@ -28,7 +36,7 @@ My goal is to continue learning, earn AWS certifications, and build secure, scal
 - Linux
 - Bash
 - Python
-- Git & GitHub
+- GitHub
 
 ---
 
@@ -39,10 +47,23 @@ Labs/
 Projects/
 Certifications/
 ```
+## Skills Demonstrated
+
+- AWS Cloud Infrastructure Deployment
+- Linux Administration
+- Bash Scripting
+- Python Automation
+- IAM and Security Best Practices
+- Object Storage
+- Database Design
+- Networking Fundamentals
+- Serverless Computing
+- Troubleshooting
+- Technical Documentation
 
 ---
 
-##  Current Goals
+##  Current Learning Goals
 
 - Complete AWS re/Start
 - Build hands-on AWS projects
