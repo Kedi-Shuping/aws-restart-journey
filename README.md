@@ -24,23 +24,23 @@ When I encounter challenges, I research AWS documentation and other technical re
 
 ---
 
-##  Technologies & Services
+## Technologies & Services
 
-AWS Services
+### AWS Services
 
-Amazon EC2
-Amazon S3
-AWS Lambda
-Amazon DynamoDB
-Amazon VPC
-IAM
-Route 53
+- Amazon EC2
+- Amazon S3
+- AWS Lambda
+- Amazon DynamoDB
+- Amazon VPC
+- IAM
+- Amazon Route 53
 
-Operating Systems & Scripting
+### Operating Systems & Scripting
 
-Linux
-Bash
-Python
+- Linux
+- Bash
+- Python
 
 
 ---
@@ -72,7 +72,7 @@ Certifications/
 
 - Complete AWS re/Start
 - Build hands-on AWS projects
-- Earn AWS Certified Cloud Practitioner
+- Earn an AWS Certified Cloud Practitioner badge
 - Continue growing my cloud engineering portfolio
 
 ---
