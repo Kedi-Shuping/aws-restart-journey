@@ -72,23 +72,39 @@ Email Notification
 
 ---
 
-## Screenshots
+---
 
-### Lambda Function Code
+# Screenshots
 
-![Lambda Function Code](screenshots/02-wordcount-lambda-function-code.png)
+## Lambda Function Code
 
-### Lambda Function Returning a 500 Error
+![Lambda Function Code](screenshots/02wordcount-lambda-function-code.png)
 
-![Lambda Error](screenshots/03-wordcount-test-returned-500.png)
+The AWS Lambda function contains the Python code responsible for counting the number of words in an uploaded text file.
 
-### Amazon S3 Trigger Configuration
+---
+
+## Initial Function Test
+
+![Function Test Failed](screenshots/03-wordcount-function-test-failed.png)
+
+The initial test exposed an issue that was identified and resolved during troubleshooting. CloudWatch logs were used to diagnose the problem before redeploying the function.
+
+---
+
+## Amazon S3 Trigger Configuration
 
 ![S3 Trigger](screenshots/05-wordcount-lambda-s3-trigger.png)
 
-### Word Count Email Notification
+The Lambda function is configured with an Amazon S3 event notification, automatically invoking the function whenever a new text file is uploaded to the bucket.
 
-![Email Notification](screenshots/06-wordcount-result-email.png)
+---
+
+## Amazon SNS Email Notification
+
+![SNS Email Notification](screenshots/06-wordcount-sns-email-notification.png)
+
+After successfully processing the uploaded file, the Lambda function publishes the word count to an Amazon SNS topic, which delivers the result via email.
 
 ---
 
