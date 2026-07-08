@@ -4,7 +4,6 @@ This folder contains my networking-related AWS re/Start labs.
 
 Topics include:
 - Amazon VPC
-- Route 53
 - Security Groups
 - Networking fundamentals
 
