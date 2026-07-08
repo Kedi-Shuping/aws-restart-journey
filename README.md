@@ -8,7 +8,7 @@ This repository documents my hands-on labs, projects, notes, and continuous lear
 
 ## About Me
 
-Hi, I'm Kedi.
+Hi, I'm Kedibone Shuping.
 
 I'm an aspiring Cloud Engineer currently completing the AWS re/Start program, where I'm building practical experience with AWS services, Linux, networking, scripting, databases, and cloud security.
 
