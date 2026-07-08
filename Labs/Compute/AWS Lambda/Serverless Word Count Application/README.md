@@ -6,7 +6,7 @@ This project demonstrates how to build a serverless, event-driven application us
 
 When a text file is uploaded to an Amazon S3 bucket, an AWS Lambda function is automatically triggered. The function reads the contents of the uploaded file, counts the number of words, and publishes the result to an Amazon SNS topic, which delivers the notification by email.
 
-This project introduced the fundamentals of serverless computing and event-driven architecture while demonstrating how multiple AWS services can work together to automate a business process.
+Through this project, I gained hands-on experience with serverless computing and event-driven architecture while demonstrating how multiple AWS services work together to automate a business process
 
 ---
 
