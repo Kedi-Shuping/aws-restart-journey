@@ -23,10 +23,22 @@ During the project, I created an IAM user with S3 full access, enabled static we
 
 The solution follows this workflow:
 
-1. **Developer** runs deployment script
-2. **AWS CLI** syncs files to **S3 bucket**
-3. **S3 bucket** hosts static website
-4. **End users** access website via bucket endpoint
+Developer
+│
+▼
+AWS CLI (update-website.sh)
+│
+▼
+S3 Bucket (kshuping004)
+│
+▼
+Static Website Hosting (Enabled)
+│
+▼
+End Users
+│
+▼
+http://kshuping004.s3-website-us-west-2.amazonaws.com
 
 ---
 
