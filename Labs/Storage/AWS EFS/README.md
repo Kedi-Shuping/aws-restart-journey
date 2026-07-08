@@ -39,3 +39,31 @@ The shared file system allows multiple EC2 instances to access the same files si
 - Connected multiple EC2 instances to shared storage
 - Verified persistent shared storage across servers
 - Used Linux commands to validate mounted file systems
+
+  ## Screenshots
+
+### 1. Amazon EFS File System Created
+This screenshot shows the successful creation of the Amazon Elastic File System (EFS).
+
+![Amazon EFS File System Created](screenshots/efs-file-system-created.png)
+
+---
+
+### 2. EFS Mount Targets Created
+This screenshot shows the successful configuration of the EFS mount targets, allowing EC2 instances within the VPC to connect to the shared file system.
+
+![EFS Mount Targets Created](screenshots/efs-mount-targets-created.png)
+
+---
+
+### 3. EFS Mounted on an EC2 Instance
+This screenshot shows the EFS file system being successfully mounted on an Amazon EC2 instance using the `amazon-efs-utils` package.
+
+![EFS Mounted on EC2 Instance](screenshots/efs-mounted-on-ec2-instance.png)
+
+---
+
+### 4. EFS Mounted Across Multiple Sites
+This screenshot verifies that the shared EFS file system is mounted and accessible across multiple instances.
+
+![EFS Mounted on All Sites](screenshots/efs-mounted-on-all-sites.png)
