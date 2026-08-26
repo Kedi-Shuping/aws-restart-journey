@@ -4,66 +4,83 @@
 
 This project demonstrates how to create and configure Amazon Elastic File System (EFS) and mount it to multiple Amazon EC2 instances.
 
-The shared file system allows multiple EC2 instances to access the same files simultaneously over the network using the NFS protocol. During the project, I created an EFS file system, configured mount targets in multiple Availability Zones, mounted the file system on two EC2 instances, and verified that changes made on one instance were immediately visible on the other.
+Amazon EFS provides shared file storage that can be accessed by multiple EC2 instances over the network using NFS. During the exercise, I created an EFS file system, configured mount targets across multiple sites, installed the Amazon EFS utilities on Linux, mounted the file system, and verified access from multiple instances.
 
-## AWS Services Used
+## Training Evidence
+
+**AWS SimuLearn:** File Systems in the Cloud  
+**Completed:** July 7, 2026
+
+[View AWS Completion Certificate](../../../Certifications/aws-simulearn-file-systems-in-the-cloud-certificate.pdf)
+
+## AWS Services and Components Used
 
 - Amazon EFS
 - Amazon EC2
 - Amazon VPC
 - Security Groups
-- Mount Targets
+- EFS Mount Targets
 - Amazon Linux
-- NFS (Network File System)
+- NFS
 
 ## Project Workflow
 
-1. Launched two Amazon EC2 instances.
-2. Created an Amazon EFS file system.
-3. Created mount targets in multiple Availability Zones.
-4. Configured Security Groups to allow NFS traffic (TCP Port 2049).
-5. Connected to both EC2 instances using EC2 Instance Connect.
-6. Installed the Amazon EFS utilities.
-7. Mounted the EFS file system on both EC2 instances.
-8. Verified that the Amazon EFS file system was successfully mounted on both EC2 instances.
-9. Created files on the first EC2 instance.
-10. Confirmed that files created on one EC2 instance were immediately visible on the second instance.
-11. Verified that both EC2 instances were reading and writing to the same shared storage.
+1. Created an Amazon EFS file system.
+2. Configured mount targets in multiple Availability Zones/sites.
+3. Configured network access for NFS traffic (TCP port 2049).
+4. Connected to EC2 instances using EC2 Instance Connect.
+5. Installed the Amazon EFS utilities on Linux.
+6. Mounted the EFS file system to a local directory.
+7. Verified that the EFS file system was successfully mounted.
+8. Verified that the shared file system was accessible across multiple sites/instances.
 
-## Skills Demonstrated
+## Technical Context
 
-- Configured shared network storage using Amazon EFS
-- Created EFS mount targets
-- Configured Security Groups for NFS communication
-- Mounted network file systems on Linux
-- Connected multiple EC2 instances to shared storage
-- Verified persistent shared storage across servers
-- Used Linux commands to validate mounted file systems
+Amazon EFS is network file storage rather than block storage attached to a single EC2 instance. EC2 clients access the same EFS file system over the VPC using NFS. EFS mount targets provide network access to the file system within the Availability Zones where clients connect.
 
-  ## Screenshots
+The practical exercise demonstrated the Linux side of this relationship: installing the EFS utilities, mounting the file system, and validating the resulting mount from EC2 instances.
+
+## Evidence
+
+The screenshots below highlight the key configuration and validation steps from the completed SimuLearn exercise.
 
 ### 1. Amazon EFS File System Created
-This screenshot shows the successful creation of the Amazon Elastic File System (EFS).
+
+This screenshot shows the successful creation of the Amazon Elastic File System (EFS), including the `PetModels-EFS-1` file system.
 
 ![Amazon EFS File System Created](screenshots/efs-file-system-created.png)
 
 ---
 
 ### 2. EFS Mount Targets Created
-This screenshot shows the successful configuration of the EFS mount targets, allowing EC2 instances within the VPC to connect to the shared file system.
+
+This screenshot shows the configuration of EFS mount targets, providing network access to the shared file system from the VPC.
 
 ![EFS Mount Targets Created](screenshots/efs-mount-targets-created.png)
 
 ---
 
 ### 3. EFS Mounted on an EC2 Instance
-This screenshot shows the EFS file system being successfully mounted on an Amazon EC2 instance using the `amazon-efs-utils` package.
+
+This screenshot shows the Amazon EFS utilities being installed and the EFS file system being mounted on a Linux EC2 instance.
 
 ![EFS Mounted on EC2 Instance](screenshots/efs-mounted-on-ec2-instance.png)
 
 ---
 
 ### 4. EFS Mounted Across Multiple Sites
-This screenshot verifies that the shared EFS file system is mounted and accessible across multiple instances.
+
+This screenshot verifies that the same EFS file system was mounted and accessible across multiple sites, with the terminal evidence showing mounts for sites A, B, and C.
 
 ![EFS Mounted on All Sites](screenshots/efs-mounted-on-all-sites.png)
+
+## Skills Demonstrated
+
+- Configured shared network storage using Amazon EFS
+- Created and configured EFS mount targets
+- Configured Security Groups for NFS communication
+- Installed EFS utilities on Linux
+- Mounted network file systems on Linux
+- Connected multiple EC2 instances/sites to shared storage
+- Used Linux commands to validate mounted file systems
+- Interpreted how EFS provides shared storage to networked compute resources
