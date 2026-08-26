@@ -36,9 +36,9 @@ Amazon EFS provides shared file storage that can be accessed by multiple EC2 ins
 
 ## Technical Context
 
-Amazon EFS is network file storage rather than block storage attached to a single EC2 instance. EC2 clients access the same EFS file system over the VPC using NFS. EFS mount targets provide network access to the file system within the Availability Zones where clients connect.
+Amazon EFS provides shared network file storage that can be accessed by multiple EC2 instances. Unlike block storage attached to an individual instance, the same EFS file system can be accessed by multiple clients over the VPC using NFS.
 
-The practical exercise demonstrated the Linux side of this relationship: installing the EFS utilities, mounting the file system, and validating the resulting mount from EC2 instances.
+EFS mount targets provide network access to the file system within the Availability Zones where clients connect. In the exercise, I worked with the Linux side of this setup by installing the EFS utilities, mounting the file system, and validating the mount from the EC2 instances.
 
 ## Evidence
 
@@ -46,7 +46,7 @@ The screenshots below highlight the key configuration and validation steps from 
 
 ### 1. Amazon EFS File System Created
 
-This screenshot shows the successful creation of the Amazon Elastic File System (EFS), including the `PetModels-EFS-1` file system.
+Created the `PetModels-EFS-1` file system used for the exercise.
 
 ![Amazon EFS File System Created](screenshots/efs-file-system-created.png)
 
@@ -54,7 +54,7 @@ This screenshot shows the successful creation of the Amazon Elastic File System 
 
 ### 2. EFS Mount Targets Created
 
-This screenshot shows the configuration of EFS mount targets, providing network access to the shared file system from the VPC.
+Configured EFS mount targets to provide network access to the file system from the VPC.
 
 ![EFS Mount Targets Created](screenshots/efs-mount-targets-created.png)
 
@@ -62,7 +62,7 @@ This screenshot shows the configuration of EFS mount targets, providing network 
 
 ### 3. EFS Mounted on an EC2 Instance
 
-This screenshot shows the Amazon EFS utilities being installed and the EFS file system being mounted on a Linux EC2 instance.
+Installed the Amazon EFS utilities on Linux and mounted the file system on an EC2 instance.
 
 ![EFS Mounted on EC2 Instance](screenshots/efs-mounted-on-ec2-instance.png)
 
@@ -70,7 +70,7 @@ This screenshot shows the Amazon EFS utilities being installed and the EFS file 
 
 ### 4. EFS Mounted Across Multiple Sites
 
-This screenshot verifies that the same EFS file system was mounted and accessible across multiple sites, with the terminal evidence showing mounts for sites A, B, and C.
+Verified that the same EFS file system was mounted and accessible from Sites A, B, and C.
 
 ![EFS Mounted on All Sites](screenshots/efs-mounted-on-all-sites.png)
 
