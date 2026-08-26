@@ -48,9 +48,9 @@ Created the EBS volume and attached `My Volume` to the Lab EC2 instance.
 
 ---
 
-### 2. EBS Mounted and Snapshot Recovery Verified
+### 2. Snapshot-Based Data Recovery
 
-The Linux terminal evidence shows the EBS volume mounted at `/mnt/data-store`, data written and verified, the original file deleted, and the restored volume mounted at `/mnt/data-store2` with the original file recovered.
+Created a snapshot of the EBS volume, deleted the original `file.txt`, and restored the snapshot to a new volume. The restored volume was mounted separately and verified to contain the original file.
 
 ![EBS Mounted and Recovery Verified](screenshots/Mounted%20EBS%20from%20Linux.png)
 
@@ -68,3 +68,5 @@ The Linux terminal evidence shows the EBS volume mounted at `/mnt/data-store`, d
 ## What I Learned
 
 This lab reinforced the difference between block storage and the compute instance using it. I also gained practical experience with the full EBS storage lifecycle: provisioning a volume, attaching and mounting it, writing data, creating a snapshot, and restoring that snapshot to recover the data.
+
+The recovery exercise showed how an EBS snapshot can provide a recoverable point-in-time copy of a volume, allowing the data to be restored to a new EBS volume when needed.
