@@ -1,169 +1,124 @@
-# Managing Services and Monitoring an EC2 Instance
+# Managing Linux Services and Monitoring
 
-## Lab Overview
+## Overview
 
-This lab focused on managing a Linux service with `systemctl`, inspecting running processes with `top`, generating a temporary CPU workload, and observing the resulting resource usage through Amazon CloudWatch.
+This lab focused on managing a Linux service on an Amazon EC2 instance and using both Linux and AWS tools to monitor system activity.
 
-The work was performed on an Amazon Linux 2 EC2 instance running in AWS.
+I worked with the Apache HTTP Server (`httpd`), used `systemctl` to manage the service, used `top` to monitor processes and CPU usage, and then used Amazon CloudWatch to observe the same CPU workload from the AWS side.
 
----
+## AWS Services and Components Used
 
-## Skills Demonstrated
+- Amazon EC2
+- Amazon CloudWatch
+- Amazon Linux
+- Apache HTTP Server (`httpd`)
+- `systemctl`
+- `top`
 
-- Inspecting Linux services with `systemctl`
-- Starting and stopping the Apache HTTP Server (`httpd`)
-- Interpreting service states such as `loaded`, `inactive (dead)`, and `active (running)`
-- Verifying a web service from a browser using an EC2 public IP address
-- Monitoring Linux processes with `top`
-- Identifying CPU-intensive processes
-- Generating a controlled CPU workload with a Bash script
-- Monitoring EC2 metrics with Amazon CloudWatch
-- Correlating an operating-system workload with CloudWatch CPU utilization
-- Using terminal output and monitoring data as troubleshooting evidence
+## Project Workflow
 
----
+1. Connected to an Amazon Linux EC2 instance using SSH.
+2. Checked the initial status of the Apache HTTP Server.
+3. Started the `httpd` service with `systemctl`.
+4. Verified that Apache was running by opening the instance's public IP address in a browser.
+5. Used `top` to establish a baseline for CPU and process activity.
+6. Ran the provided `stress.sh` script to generate a temporary CPU workload.
+7. Used `top` to observe the processes responsible for the increased CPU usage.
+8. Opened the EC2 automatic dashboard in Amazon CloudWatch and observed the resulting CPU utilization spike.
+9. Waited for the workload to finish and observed CPU utilization return toward its normal level.
+10. Stopped the Apache service as part of the lab cleanup.
 
-## Linux Service Management
+## Technical Context
 
-The first part of the lab used `systemctl` to inspect and manage the Apache HTTP Server.
+### Managing the Apache service
 
-### Check service status
+The Apache HTTP Server was already installed on the instance, but it was initially inactive. I used `systemctl` to check and manage its state.
 
 ```bash
 sudo systemctl status httpd.service
-```
-
-The service was installed and loaded but initially showed:
-
-```text
-Active: inactive (dead)
-```
-
-This demonstrates an important distinction: a service can be **installed and available** without currently being **running**.
-
-### Start Apache
-
-```bash
 sudo systemctl start httpd.service
-```
-
-The service was then checked again:
-
-```bash
-sudo systemctl status httpd.service
-```
-
-The resulting state was:
-
-```text
-Active: active (running)
-```
-
-The status output also showed the Apache process and its worker processes running under the `httpd.service` control group.
-
-### Verify the web server
-
-The EC2 instance's public IP address was opened in a browser using HTTP. The Apache HTTP Server 2.4 test page was returned successfully, confirming that the service was reachable and functioning.
-
-### Stop Apache
-
-After verification, the service was stopped as part of the lab cleanup:
-
-```bash
 sudo systemctl stop httpd.service
 ```
 
-The lab therefore demonstrated the complete service-management cycle:
+The initial status showed the service as `inactive (dead)`. After starting it, the status changed to `active (running)`.
 
-**inspect → start → verify → stop**
+I then opened the EC2 instance's public IP address in a browser and received the Apache HTTP Server test page. This provided a practical check that the service was not only running but also responding to HTTP requests.
 
----
+One useful distinction from this exercise was the difference between **starting** and **enabling** a service. Starting `httpd` made it run immediately. Enabling a service controls whether it is configured to start automatically when the system boots. These are separate operations.
 
-## Process Monitoring with `top`
+### Monitoring processes with `top`
 
-The next part of the lab introduced the Linux `top` utility.
+I used `top` to look at the instance before and during a controlled workload.
 
-```bash
-top
-```
+The initial view showed the instance largely idle, with CPU usage at approximately 0%.
 
-`top` provides a live view of processes and system resource usage, including CPU and memory utilization.
-
-The initial observation showed the instance largely idle, with CPU utilization at approximately 0%.
-
-The workload script was then started with:
+I then ran:
 
 ```bash
 ./stress.sh & top
 ```
 
-This launched the workload in the background while opening `top` for live monitoring.
+The `stress` processes appeared near the top of the process list and CPU usage increased substantially. The captured observation showed approximately 62% CPU utilization with CPU idle at 0%.
 
-During the workload, multiple `stress` processes appeared near the top of the process list. The observed CPU utilization rose substantially, with the EC2 instance showing approximately 62% CPU utilization at the time of the captured observation.
+This was useful because `top` showed more than just a CPU percentage. It showed **which processes were responsible for the increase**.
 
-The process table made the cause visible: the `stress` processes were consuming the CPU rather than the increase being an unexplained system metric.
+### Monitoring the same event with CloudWatch
 
-The script was designed to run temporarily and subsequently completed, allowing the instance to return to its normal workload level.
+After generating the workload, I opened the EC2 automatic dashboard in Amazon CloudWatch.
 
----
+The CPU Utilization graph showed a clear spike, reaching approximately 65.69%, followed by a decline after the workload finished.
 
-## Monitoring with Amazon CloudWatch
+The values shown by `top` and CloudWatch were not identical because they represent observations made through different monitoring mechanisms and time aggregation. The important result was that the CPU workload observed inside Linux was also visible as a measurable event in CloudWatch.
 
-The lab then moved from host-level monitoring to AWS-level monitoring using Amazon CloudWatch.
-
-The CloudWatch EC2 automatic dashboard displayed metrics including:
-
-- CPU Utilization
-- DiskReadBytes
-- DiskReadOps
-- DiskWriteBytes
-- DiskWriteOps
-- NetworkIn
-
-The CPU Utilization graph showed a clear spike corresponding to the period when the `stress.sh` workload was running. After the workload ended, CPU utilization dropped back toward the instance's normal baseline.
-
-This provided a useful connection between two monitoring layers:
+This gave me a useful view of the same system from two levels:
 
 ```text
-Linux process
-     ↓
+Linux processes
+      ↓
 CPU workload
-     ↓
-EC2 instance resource consumption
-     ↓
-CloudWatch CPU Utilization metric
+      ↓
+EC2 resource usage
+      ↓
+CloudWatch CPU Utilization
 ```
 
-The lab therefore demonstrated that CloudWatch can provide an AWS-level view of activity occurring inside an EC2 instance, while Linux tools such as `top` provide more detailed process-level evidence.
+## Evidence
 
----
+The evidence from this lab is based on the actual service states, process activity, and CloudWatch metrics observed during the exercise. Screenshots were captured selectively rather than documenting every step of the lab.
+
+### Apache Service Running
+
+`systemctl status httpd.service` showed the Apache service changing from `inactive (dead)` to `active (running)` after it was started.
+
+### Apache Test Page
+
+The Apache HTTP Server test page was successfully returned when the EC2 instance's public IP address was opened in a browser, confirming that the web server was responding.
+
+### CPU Workload Observed with `top`
+
+The `top` output showed multiple `stress` processes consuming CPU during the controlled workload, with CPU idle dropping to 0%.
+
+### CloudWatch CPU Utilization
+
+The EC2 CloudWatch dashboard showed the corresponding CPU utilization spike and the subsequent drop after the workload completed.
+
+## Skills Demonstrated
+
+- Connected to an Amazon Linux EC2 instance using SSH
+- Managed Linux services with `systemctl`
+- Started and stopped the Apache HTTP Server
+- Verified a web service from an EC2 public IP address
+- Monitored Linux processes with `top`
+- Identified CPU-intensive processes
+- Generated a controlled CPU workload
+- Monitored EC2 metrics with Amazon CloudWatch
+- Correlated host-level process activity with AWS monitoring data
+- Used observed system behaviour as troubleshooting evidence
 
 ## Key Lessons Learned
 
-### 1. Installed does not mean running
-
-`systemctl status` distinguishes between a service being loaded and a service actually running. In this lab, Apache was installed and ready but initially inactive.
-
-### 2. `start` and `enable` are different operations
-
-Starting `httpd` made the service run immediately. The lab did not require enabling it to start automatically at boot. These are separate service-management concepts.
-
-### 3. `top` answers "what is using the machine?"
-
-CloudWatch can show that CPU utilization increased, but `top` can reveal the individual processes responsible. Using both provides stronger troubleshooting evidence than relying on a single monitoring layer.
-
-### 4. Monitoring becomes more useful when correlated
-
-The most valuable observation in this lab was not simply that CPU utilization increased. The increase could be correlated with the `stress` processes visible in `top`, and the same workload was reflected as a spike in the CloudWatch CPU Utilization metric.
-
-### 5. Evidence does not always need to be a screenshot
-
-For this lab, the repository documents the commands, observed states, and results directly rather than accumulating screenshots that are difficult to manage later. The emphasis is on preserving reproducible technical evidence and explaining what the evidence demonstrates.
-
----
-
-## Outcome
-
-Successfully managed the Apache HTTP Server on an EC2 instance, verified the service through HTTP, monitored Linux processes during a controlled CPU workload, and correlated host-level observations with Amazon CloudWatch metrics.
-
-This lab strengthened the connection between **Linux administration, process troubleshooting, EC2 monitoring, and AWS observability**.
+- A service can be installed and loaded without currently running.
+- `systemctl start` and `systemctl enable` perform different jobs.
+- `top` is useful for identifying the processes behind changes in resource usage.
+- CloudWatch provides an AWS-level view of resource activity on an EC2 instance.
+- Looking at the same event from both the operating-system and AWS monitoring layers makes troubleshooting easier to understand.
