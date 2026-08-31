@@ -58,7 +58,7 @@ I then ran:
 ./stress.sh & top
 ```
 
-The `stress` processes appeared near the top of the process list and CPU usage increased substantially. The captured observation showed approximately 62% CPU utilization with CPU idle at 0%.
+The `stress` processes appeared near the top of the process list and CPU usage increased substantially. The captured `top` output showed the `stress` processes consuming CPU, with approximately 62.2% CPU usage in user space and 0.0% CPU idle.
 
 This was useful because `top` showed more than just a CPU percentage. It showed **which processes were responsible for the increase**.
 
@@ -68,7 +68,7 @@ After generating the workload, I opened the EC2 automatic dashboard in Amazon Cl
 
 The CPU Utilization graph showed a clear spike, reaching approximately 65.69%, followed by a decline after the workload finished.
 
-The values shown by `top` and CloudWatch were not identical because they represent observations made through different monitoring mechanisms and time aggregation. The important result was that the CPU workload observed inside Linux was also visible as a measurable event in CloudWatch.
+The values shown by `top` and CloudWatch were not identical, but both showed the same underlying CPU workload: a sharp increase followed by a return toward normal levels. The important result was that the CPU workload observed inside Linux was also visible as a measurable event in CloudWatch.
 
 This gave me a useful view of the same system from two levels:
 
