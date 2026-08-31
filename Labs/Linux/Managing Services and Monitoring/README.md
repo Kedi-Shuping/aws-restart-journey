@@ -86,21 +86,41 @@ CloudWatch CPU Utilization
 
 The evidence from this lab is based on the actual service states, process activity, and CloudWatch metrics observed during the exercise. Screenshots were captured selectively rather than documenting every step of the lab.
 
-### Apache Service Running
+### Apache Service — Initial State
 
-`systemctl status httpd.service` showed the Apache service changing from `inactive (dead)` to `active (running)` after it was started.
+`systemctl status httpd.service` showed the Apache service as `inactive (dead)` before it was started.
+
+![Apache service inactive](screenshots/01-httpd-inactive.png)
+
+### Apache Service — Running
+
+After starting the service, `httpd` reported `active (running)`.
+
+![Apache service running](screenshots/02-httpd-active.png)
 
 ### Apache Test Page
 
 The Apache HTTP Server test page was successfully returned when the EC2 instance's public IP address was opened in a browser, confirming that the web server was responding.
 
+![Apache test page](screenshots/03-apache-test-page.png)
+
+### CPU Monitoring — Baseline
+
+Before generating the workload, `top` showed the instance largely idle. This established a baseline for comparison with the workload state.
+
+![top baseline](screenshots/04-top-baseline.png)
+
 ### CPU Workload Observed with `top`
 
-The `top` output showed multiple `stress` processes consuming CPU during the controlled workload, with CPU idle dropping to 0%.
+During the controlled workload, `top` showed multiple `stress` processes consuming CPU. The captured observation showed approximately 62.2% CPU usage in user space and 0.0% CPU idle.
+
+![CPU stress workload observed with top](screenshots/05-cpu-stress.png)
 
 ### CloudWatch CPU Utilization
 
-The EC2 CloudWatch dashboard showed the corresponding CPU utilization spike and the subsequent drop after the workload completed.
+The EC2 CloudWatch dashboard showed the corresponding CPU utilization spike, reaching approximately 65.69%, followed by a decline after the workload completed.
+
+![CloudWatch CPU utilization spike](screenshots/06-cloudwatch-cpu-spike.png)
 
 ## Skills Demonstrated
 
