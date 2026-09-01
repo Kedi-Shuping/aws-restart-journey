@@ -2,39 +2,32 @@
 
 ## Overview
 
-This lab focused on building a Bash script that dynamically creates a sequence of numbered files while adapting to the files that already exist in the working directory.
+This lab focused on using Bash to create a sequence of numbered files while taking the files already in the directory into account.
 
-Rather than hard-coding the starting number, the script discovers the highest existing `kedi<number>` filename, calculates the next available number, and creates 25 sequential files.
+Instead of choosing a starting number manually, I built the script so it could look at the existing `kedi<number>` files, find the highest number, and continue the sequence from there.
 
 ## What I Built
 
-I created an executable Bash script named `createfiles.sh` that:
+I created an executable Bash script called `createfiles.sh`.
 
-1. Identifies existing filenames using the `kedi` prefix.
-2. Uses a regular expression to restrict matches to filenames containing a numeric suffix.
-3. Extracts the numeric portion of matching filenames.
-4. Tracks the highest existing number.
-5. Calculates the next starting number.
-6. Uses a C-style `for` loop to create 25 sequential files.
-7. Increments the number after each iteration.
+The script:
 
-The core generation loop is:
+1. Looks for existing files beginning with `kedi`.
+2. Uses a regular expression to make sure the filename has a numeric suffix.
+3. Extracts the number from each matching filename.
+4. Keeps track of the highest number found.
+5. Uses the next number as the starting point.
+6. Creates 25 files in sequence with a C-style `for` loop.
 
-```bash
-for ((i=0; i<25; i++))
-do
-    touch "$NAME$NUMBER"
-    ((NUMBER++))
-done
-```
+The file creation itself is handled with `touch`, while the number is incremented after each file is created.
 
 ## Verification
 
-A controlled test started at `kedi28` and produced the sequence through `kedi52`, demonstrating 25 iterations.
+Before the final run, I tested the loop with `START=28`. It created the sequence from `kedi28` through `kedi52`, giving 25 files.
 
-During the final execution, the script detected that `kedi28` already existed, calculated `START=29`, and created files through `kedi53`.
+For the final run, the script detected the existing sequence and continued from the next available number, creating files through `kedi53`.
 
-The resulting numbered files were verified with:
+I verified the resulting files with:
 
 ```bash
 ls -1 kedi[0-9]* | wc -l
@@ -42,38 +35,49 @@ ls -1 kedi[0-9]* | wc -l
 
 The command returned `31`.
 
-The script was also validated with:
+I also checked the script syntax with:
 
 ```bash
 bash -n createfiles.sh
 ```
 
-with no syntax errors, and its executable permissions were verified before finalizing the lab.
+No syntax errors were reported. The script's executable permissions were also verified before finishing the lab.
 
 ## Key Bash Concepts
 
 - Variables and variable expansion
-- Filename globbing
 - Regular-expression matching with `=~`
 - Parameter expansion
-- Arithmetic expansion
+- Arithmetic and increment operators
 - Conditional logic
 - C-style `for` loops
-- Increment operators
+- `touch` for file creation
 - Filesystem state discovery
 - Script permissions
 - Command-line verification
 
 ## What I Learned
 
-The most important lesson from this lab was that Bash scripts can make decisions based on the current state of the filesystem instead of relying on fixed assumptions. The script therefore behaves as a small state-aware automation tool: it discovers where the existing sequence ends and continues from there.
+The part I found most useful in this lab was making the script respond to what was already in the directory. The starting number wasn't hard-coded; the script had to discover the current state first and then work out where the next sequence should begin.
 
-This also reinforced the difference between writing a command that works once and writing automation that can safely adapt to an environment that has already changed.
+That was a good reminder that there is a difference between writing a command that works once and writing a script that can adapt when the environment has already changed.
 
 ## Screenshots
 
-Selected evidence is kept intentionally limited to the strongest technical results.
+### 1. File Creation Sequence
 
-1. `04-file-creation-sequence.png` — controlled 25-iteration generation from `kedi28` through `kedi52`.
-2. `05-final-execution-and-verification.png` — final script execution, resulting files through `kedi53`, and the 31-file verification.
-3. `06-script-executable-permissions.png` — executable permission verification for `createfiles.sh`.
+The controlled test created 25 files from `kedi28` through `kedi52`.
+
+![File creation sequence](screenshots/04-file-creation-sequence.png)
+
+### 2. Final Execution and Verification
+
+The final run continued the sequence through `kedi53`, and the resulting directory contained 31 numbered files.
+
+![Final execution and verification](screenshots/05-final-execution-and-verification.png)
+
+### 3. Script Permissions
+
+The script's executable permissions were verified before the lab was completed.
+
+![Script executable permissions](screenshots/06-script-executable-permissions.png)
