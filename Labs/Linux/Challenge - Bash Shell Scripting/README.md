@@ -1,4 +1,4 @@
-# Lab 253 — Challenge: Bash Shell Scripting
+# Challenge: Bash Shell Scripting
 
 ## Overview
 
@@ -10,14 +10,7 @@ Instead of choosing a starting number manually, I built the script so it could l
 
 I created an executable Bash script called `createfiles.sh`.
 
-The script:
-
-1. Looks for existing files beginning with `kedi`.
-2. Uses a regular expression to make sure the filename has a numeric suffix.
-3. Extracts the number from each matching filename.
-4. Keeps track of the highest number found.
-5. Uses the next number as the starting point.
-6. Creates 25 files in sequence with a C-style `for` loop.
+The script looks through the existing `kedi` files, checks that the filename ends in a number, and keeps track of the highest number it finds. It then starts at the next number and creates 25 files in sequence.
 
 The file creation itself is handled with `touch`, while the number is incremented after each file is created.
 
@@ -42,19 +35,6 @@ bash -n createfiles.sh
 ```
 
 No syntax errors were reported. The script's executable permissions were also verified before finishing the lab.
-
-## Key Bash Concepts
-
-- Variables and variable expansion
-- Regular-expression matching with `=~`
-- Parameter expansion
-- Arithmetic and increment operators
-- Conditional logic
-- C-style `for` loops
-- `touch` for file creation
-- Filesystem state discovery
-- Script permissions
-- Command-line verification
 
 ## What I Learned
 
