@@ -30,7 +30,7 @@ The lab also required troubleshooting a MariaDB engine-version mismatch between 
 8. Queried the RDS database to verify the migrated product data.
 9. Updated the `/cafe/dbUrl` Systems Manager Parameter Store value so the Café application pointed to the RDS endpoint.
 10. Verified that the Café application could still retrieve the original order after the database cutover.
-11. Used CloudWatch `DatabaseConnections` to observe database connection activity.
+11. Used CloudWatch `DatabaseConnections` to observe database connection activity while an interactive database session was opened and closed.
 12. Ended the temporary lab environment and initiated resource termination.
 
 ## Technical Context
@@ -60,15 +60,23 @@ The RDS instance was configured as private (`PubliclyAccessible: false`) and ass
 
 ## Troubleshooting
 
-The lab instructions specified MariaDB engine version `10.11.11`, but the AWS CLI returned:
+The lab instructions specified MariaDB engine version `10.11.11`, but the AWS CLI rejected the provisioning request with:
 
 ```text
 InvalidParameterCombination: Cannot find version 10.11.11 for mariadb
 ```
 
-Instead of guessing, I queried the Region for the available MariaDB engine versions. MariaDB 10.11.18 was available, so I retained the intended 10.11 engine family and used 10.11.18 for the RDS instance.
+Rather than assuming the lab instructions were still current, I queried the Region for the engine versions actually available:
 
-This demonstrated the difference between following a training instruction literally and validating configuration against the current AWS environment.
+```bash
+aws rds describe-db-engine-versions \
+  --engine mariadb \
+  --query "DBEngineVersions[*].EngineVersion"
+```
+
+The returned versions included MariaDB `10.11.13` through `10.11.18`. I selected `10.11.18`, retaining the intended MariaDB 10.11 engine family, and successfully provisioned the RDS instance.
+
+This was an example of configuration/version drift between training material and the live AWS environment. The appropriate response was to establish the current state through AWS rather than blindly retrying the stale configuration.
 
 ## Verification
 
@@ -78,7 +86,7 @@ The migration was verified at multiple layers:
 - `cafe_db` was present on RDS after the restore.
 - The migrated `product` table returned its application data from RDS.
 - The Café application's Order History continued to display the original order after the application endpoint was changed to RDS.
-- CloudWatch `DatabaseConnections` reflected active database connection activity.
+- CloudWatch `DatabaseConnections` reflected active database connection activity and returned to zero after the interactive session was closed.
 
 ## Screenshots
 
@@ -88,11 +96,17 @@ The migration was verified at multiple layers:
 
 The original Café order was recorded before migration so that the same data could be verified after the application was repointed to RDS.
 
+### Engine-Version Troubleshooting
+
+![MariaDB engine-version troubleshooting](screenshots/06-rds-engine-version-troubleshooting.png)
+
+The lab specified MariaDB `10.11.11`, but AWS reported that the version was unavailable. The subsequent CLI query established the currently available engine versions, including `10.11.18`, which was used for the successful deployment.
+
 ### RDS Instance Created
 
 ![Successful RDS instance creation](screenshots/02-rds-instance-created.png)
 
-The RDS instance was created as a private MariaDB 10.11.18 instance using the dedicated database security group and DB subnet group.
+The RDS instance was created as a private MariaDB 10.11.18 instance using the dedicated database security group and DB subnet group. The screenshot has been redacted to remove the lab database password while preserving the configuration and successful AWS response.
 
 ### RDS Instance Available
 
@@ -104,7 +118,7 @@ The RDS instance reached `available` status and returned its endpoint, confirmin
 
 ![Migrated product data verified in RDS](screenshots/04-rds-database-migration-verified.png)
 
-The `product` table was queried through the RDS endpoint and returned the migrated Café product catalogue.
+The `product` table was queried through the RDS endpoint and returned the migrated Café product catalogue. The screenshot has been redacted to remove the lab database password while preserving the connection and query evidence.
 
 ### Application Verification
 
@@ -114,9 +128,9 @@ After updating the application's database endpoint, Order History still returned
 
 ### CloudWatch Monitoring
 
-![CloudWatch DatabaseConnections metric](screenshots/06-rds-cloudwatch-database-connections.png)
+![CloudWatch DatabaseConnections metric](screenshots/07-rds-cloudwatch-database-connections.png)
 
-CloudWatch `DatabaseConnections` was observed with a one-minute period while an interactive MariaDB connection was opened and then closed.
+CloudWatch `DatabaseConnections` was observed with a one-minute period while an interactive MariaDB connection was opened and then closed. The metric showed connection activity and subsequently returned to zero.
 
 ## Skills Demonstrated
 
