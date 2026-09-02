@@ -6,11 +6,6 @@ This lab focused on using Bash to automate the creation of a compressed backup o
 
 I created an executable Bash script that generates a timestamped backup filename, builds the archive with `tar`, and stores the resulting `.tar.gz` file in the `backups` directory.
 
-## Training Evidence
-
-**AWS re/Start Lab:** 251 — Bash Shell Scripts  
-**Completed:** August 31, 2026
-
 ## AWS Services and Tools Used
 
 - Amazon EC2
