@@ -1,19 +1,12 @@
-# Troubleshooting a VPC
+# VPC Troubleshooting and Network Forensics
 
 ## Overview
 
-AWS re/Start hands-on lab focused on diagnosing and repairing VPC connectivity problems using layered network reasoning and VPC Flow Logs.
+This project demonstrates how to troubleshoot VPC connectivity problems by following network traffic through the AWS networking stack and using VPC Flow Logs to investigate rejected traffic.
 
-The lab involved two separate connectivity failures affecting the same EC2 web server. Rather than treating the symptoms as isolated problems, the investigation followed the packet through the VPC networking layers and used observable results to identify the failing control.
+During the exercise, I diagnosed two connectivity failures affecting an EC2 web server. The first prevented HTTP access because the public subnet was missing a route to the Internet Gateway. The second prevented SSH access because a Network ACL explicitly denied TCP port 22. I then used VPC Flow Logs to correlate the failed SSH connection with the network configuration and verify the diagnosis.
 
-## Objectives
-
-- Create and verify VPC Flow Logs.
-- Troubleshoot VPC and network configuration.
-- Analyze VPC Flow Logs to identify rejected traffic.
-- Correlate observed traffic with AWS networking configuration.
-
-## AWS Services / Components
+## AWS Services and Components Used
 
 - Amazon VPC
 - Amazon EC2
@@ -25,29 +18,39 @@ The lab involved two separate connectivity failures affecting the same EC2 web s
 - Security Groups
 - AWS CLI
 
-## Incident 1 — Web Server HTTP Access Failed
+## Project Workflow
 
-### Problem
+1. Connected to the CLI Host and configured the AWS CLI for the lab environment.
+2. Created an Amazon S3 bucket to receive VPC Flow Logs.
+3. Enabled VPC Flow Logs and verified that log delivery was active and successful.
+4. Investigated failed HTTP access to the EC2 web server using network testing and VPC configuration.
+5. Identified and repaired the missing default route to the Internet Gateway.
+6. Verified that HTTP access to the web server was restored.
+7. Investigated the remaining SSH connectivity failure by examining the subnet Network ACL.
+8. Identified and removed the explicit TCP/22 deny rule.
+9. Verified SSH access by connecting to the web server and confirming the remote hostname.
+10. Retrieved the VPC Flow Logs from Amazon S3 and analyzed rejected TCP/22 traffic.
+11. Correlated the rejected flow with the web server's network interface and the Network ACL configuration.
 
-The web server's public IP did not load in a browser. Initial network testing showed the host was not responding normally, while `nmap -Pn` showed the host was reachable but the scanned ports were filtered.
+## Technical Context
 
-### Initial hypothesis
+A VPC connection depends on several networking controls working together. Route tables determine where traffic is sent, while Network ACLs and Security Groups control whether traffic is permitted at the subnet and instance levels.
 
-Security Group rules were considered first because TCP/80 access was failing.
+For the web server's public connectivity, the associated subnet route table contained the VPC local route but no default route to the Internet Gateway. Although the Security Group allowed inbound HTTP and SSH traffic, there was no routing path for Internet-bound traffic.
 
-### Investigation
+After HTTP access was restored, SSH remained unavailable. The subnet Network ACL contained an explicit inbound deny for TCP port 22. Because Network ACL rules are evaluated in ascending rule-number order, the deny rule matched before the later broad allow rule.
 
-The web server Security Group already allowed inbound TCP/80 and TCP/22 from `0.0.0.0/0`, so the Security Group did not explain the HTTP failure.
+VPC Flow Logs provided another view of the problem. They recorded the source, destination, ports, protocol, action, and network interface associated with the traffic. This allowed the rejected SSH connection to be correlated with the affected EC2 instance and the NACL configuration.
 
-The associated public subnet route table contained only the VPC local route and was missing the default route to the Internet Gateway.
+## Troubleshooting and Analysis
 
-### Root cause
+### HTTP Connectivity
 
-The subnet had no `0.0.0.0/0` route pointing to the Internet Gateway. The instance therefore had no routing path for Internet-bound traffic.
+The first test with `nmap` reported that the host appeared to be down. Repeating the test with `nmap -Pn` showed that the host was reachable, but the scanned ports were filtered.
 
-### Fix
+I first examined the Security Group because TCP/80 access was failing. The Security Group already permitted inbound TCP/80 and TCP/22, so the next layer in the packet path was the subnet routing configuration.
 
-Added the default route to the Internet Gateway:
+The public subnet route table was missing the default route to the Internet Gateway. I added the route:
 
 ```bash
 aws ec2 create-route \
@@ -56,31 +59,13 @@ aws ec2 create-route \
   --gateway-id igw-041b735629c399b76
 ```
 
-### Verification
+The web server then became reachable over HTTP and returned `Hello From Your Web Server!`.
 
-The web server subsequently loaded successfully and returned:
+### SSH Connectivity
 
-> Hello From Your Web Server!
+With HTTP restored, SSH access was tested separately. The Network ACL associated with the subnet contained an explicit inbound rule denying TCP port 22 from `0.0.0.0/0`.
 
-## Incident 2 — SSH Access Failed
-
-### Problem
-
-HTTP access was restored, but EC2 Instance Connect / SSH access to the web server still failed.
-
-### Investigation
-
-The subnet's Network ACL contained an explicit inbound rule denying TCP/22 from `0.0.0.0/0`.
-
-Network ACL rules are evaluated in ascending rule-number order, with the first matching rule taking effect. The explicit deny therefore matched SSH traffic before the later broad allow rule could apply.
-
-### Root cause
-
-Inbound Network ACL rule 40 denied TCP port 22.
-
-### Fix
-
-Removed the offending rule:
+I removed the offending rule:
 
 ```bash
 aws ec2 delete-network-acl-entry \
@@ -89,47 +74,43 @@ aws ec2 delete-network-acl-entry \
   --ingress
 ```
 
-### Verification
-
-EC2 Instance Connect / SSH succeeded, and the remote host confirmed its identity:
+SSH access was then restored. The connection was verified from the web server with:
 
 ```text
 [ec2-user@web-server ~]$ hostname
 web-server
 ```
 
-## Flow Log Forensics
+### VPC Flow Log Analysis
 
-After enabling VPC Flow Logs and confirming delivery to S3, the log files were retrieved from the bucket and inspected from the CLI Host.
+After retrieving the Flow Logs from Amazon S3, I initially used a broad search for `22`. This produced false positives because the value could appear inside unrelated port numbers and other fields.
 
-A broad text search initially produced false positives because the string `22` can occur inside unrelated port numbers or other fields. The investigation was refined to an exact destination-port and action filter:
+I refined the search to the exact destination-port and action fields:
 
 ```bash
 awk '$7 == 22 && $13 == "REJECT" {print}' *.log
 ```
 
-This exposed the relevant rejected SSH records:
+The relevant records showed TCP/22 connection attempts from the CLI Host to the web server:
 
 ```text
 2 388245325342 eni-04de19ecd5eb08234 35.161.200.46 10.0.1.21 44376 22 6 1 60 1788426218 1788426248 REJECT OK
 2 388245325342 eni-04de19ecd5eb08234 35.161.200.46 10.0.1.21 44382 22 6 1 60 1788426218 1788426248 REJECT OK
 ```
 
-The records showed:
+The flow showed:
 
-- Source: `35.161.200.46` (CLI Host)
-- Destination: `10.0.1.21` (Web Server private IP)
+- Source: `35.161.200.46` — CLI Host
+- Destination: `10.0.1.21` — Web Server private IP
 - Destination port: `22`
 - Protocol: TCP (`6`)
 - Action: `REJECT`
-- ENI: `eni-04de19ecd5eb08234`
+- Network interface: `eni-04de19ecd5eb08234`
 - Time window: `09:03:38–09:04:08 UTC`
 
-The ENI was then correlated to the web server using AWS CLI, confirming that it belonged to the EC2 instance with private IP `10.0.1.21`.
+I then correlated the network interface with its EC2 instance using the AWS CLI. The interface belonged to the web server at `10.0.1.21`.
 
-### Important forensic distinction
-
-VPC Flow Logs report observed network traffic and whether it was accepted or rejected; they do not directly state that a particular Network ACL rule caused the rejection. Root cause was established by correlating the rejected TCP/22 records with the NACL configuration, removing the matching deny rule, and successfully repeating the SSH connection.
+The Flow Log did not identify Network ACL Rule 40 by itself. The root cause was established by combining the observed `REJECT` records with the NACL configuration, removing the matching deny rule, and successfully repeating the SSH connection.
 
 ## Packet Path
 
@@ -140,9 +121,9 @@ CLI Host
   ▼
 Web Server ENI
   │
-  ├── Network ACL → explicit TCP/22 DENY (Rule 40)
-  │
-  └── Flow Log → REJECT
+  └── Network ACL → Rule 40 DENY
+                    ↓
+                 REJECT
 
 After removing Rule 40:
 
@@ -157,55 +138,64 @@ Web Server ENI
                  SSH succeeds
 ```
 
-## What This Lab Demonstrated
-
-- A route table determines where traffic is routed; it does not authorize traffic.
-- A Network ACL is a subnet-level, stateless traffic filter.
-- A Security Group is an instance-level, stateful traffic filter.
-- Route tables, NACLs, and Security Groups solve different parts of the packet's journey.
-- VPC Flow Logs are metadata about observed network flows, not packet captures.
-- Broad searches can create misleading forensic results; filtering on exact fields produces stronger forensic results.
-- VPC Flow Logs can be correlated with AWS resource configuration to strengthen a root-cause diagnosis.
-- Network troubleshooting is more reliable when the packet path is followed layer by layer.
-
-## Key Lesson
-
-The most important skill demonstrated was not memorizing AWS console steps. It was using observable results to move from symptom → hypothesis → diagnostic test → root cause → targeted fix → verification.
-
 ## Screenshots
 
-### Initial connectivity symptoms
+### Initial Connectivity Testing
 
-The first test showed the difference between failed host discovery and a reachable host whose ports were being filtered.
+The initial `nmap` results showed the difference between failed host discovery and a reachable host with filtered ports.
 
 ![Nmap host discovery versus port filtering](screenshots/01-nmap-host-discovery-vs-port-filtering.png)
 
-### Missing Internet Gateway route
+---
 
-The associated public subnet route table contained the VPC local route but no default route to the Internet Gateway.
+### Missing Internet Gateway Route
+
+The public subnet route table showed the VPC local route but no default route to the Internet Gateway.
 
 ![Route table missing Internet Gateway route](screenshots/02-route-table-missing-internet-gateway-route.png)
 
-### HTTP access restored
+---
+
+### HTTP Access Restored
 
 After the routing path was repaired, the web server became reachable over HTTP.
 
 ![Web server restored after route fix](screenshots/03-web-server-restored-after-route-fix.png)
 
-### NACL blocking SSH
+---
 
-The Network ACL contained an explicit inbound deny for TCP/22. Because NACL rules are evaluated in ascending order, Rule 40 matched before the later allow rule.
+### Network ACL Blocking SSH
+
+The subnet Network ACL contained an explicit inbound deny for TCP/22. The lower rule number caused the deny to match before the later allow rule.
 
 ![NACL inbound SSH deny rule](screenshots/04-nacl-inbound-ssh-deny-rule.png)
 
-### SSH access restored
+---
+
+### SSH Access Restored
 
 Removing the offending NACL rule restored SSH access to the web server.
 
 ![SSH access restored after NACL fix](screenshots/05-ssh-access-restored-nacl-fix.png)
 
-### Flow Log forensic correlation
+---
 
-The Flow Log records captured the relevant CLI Host to Web Server TCP/22 attempts as `REJECT`, providing network-level corroboration of the failed SSH connection.
+### Flow Log Analysis
 
-![VPC Flow Log rejected SSH evidence](screenshots/06-vpc-flow-log-rejected-ssh-evidence.png)
+The Flow Log records captured the relevant CLI Host to Web Server TCP/22 attempts as `REJECT`, supporting the diagnosis of the failed SSH connection.
+
+![VPC Flow Log rejected SSH analysis](screenshots/06-vpc-flow-log-rejected-ssh-evidence.png)
+
+## Skills Demonstrated
+
+- Troubleshot VPC connectivity using layered network reasoning
+- Diagnosed route table configuration problems
+- Configured Internet Gateway routing for public subnet connectivity
+- Analyzed Network ACL rule evaluation and stateless filtering
+- Distinguished the roles of Route Tables, Network ACLs, and Security Groups
+- Created and verified VPC Flow Logs
+- Retrieved and analyzed Flow Log data from Amazon S3
+- Used AWS CLI for network investigation and resource correlation
+- Refined diagnostic searches to avoid false positives
+- Correlated network telemetry with AWS resource configuration
+- Verified remediation through successful network connectivity tests
