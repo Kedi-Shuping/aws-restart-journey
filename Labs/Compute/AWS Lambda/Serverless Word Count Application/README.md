@@ -1,14 +1,12 @@
 # AWS Lambda: Serverless Word Counter
 
-## Project Overview
+## Overview
 
-This project demonstrates how to build a serverless, event-driven application using AWS Lambda, Amazon S3, and Amazon SNS.
+This project demonstrates a serverless, event-driven workflow using AWS Lambda, Amazon S3, and Amazon SNS.
 
-When a text file is uploaded to an Amazon S3 bucket, an AWS Lambda function is automatically triggered. The function reads the contents of the uploaded file, counts the number of words, and publishes the result to an Amazon SNS topic, which delivers the notification by email.
+When a text file is uploaded to an Amazon S3 bucket, an S3 event automatically invokes an AWS Lambda function. The function reads the uploaded file, counts its words, and publishes the result to an Amazon SNS topic, which delivers the notification by email.
 
-Through this project, I gained hands-on experience with serverless computing and event-driven architecture while demonstrating how multiple AWS services work together to automate a business process
-
----
+The project demonstrates how multiple managed AWS services can be connected to automate a simple business process without maintaining a traditional application server.
 
 ## Architecture
 
@@ -32,17 +30,13 @@ Amazon SNS
 Email Notification
 ```
 
----
+## AWS Services and Components Used
 
-## AWS Services Used
-
-- Amazon S3 – Stores uploaded text files and triggers the Lambda function.
-- AWS Lambda – Processes uploaded files and counts the number of words.
-- Amazon SNS – Sends the word count results to subscribed email recipients.
-- AWS IAM – Manages the permissions required for Lambda to access Amazon S3 and Amazon SNS.
-- Amazon CloudWatch Logs – Captures execution logs and supports troubleshooting.
-
----
+- **Amazon S3** – Stores uploaded text files and generates the object-created event.
+- **AWS Lambda** – Processes the uploaded file and counts the words.
+- **Amazon SNS** – Publishes the result and delivers the notification to subscribed email recipients.
+- **AWS IAM** – Provides the permissions required by the Lambda function.
+- **Amazon CloudWatch Logs** – Captures Lambda execution information and supports troubleshooting.
 
 ## Project Workflow
 
@@ -51,70 +45,27 @@ Email Notification
 3. Subscribed an email address to the SNS topic and confirmed the subscription.
 4. Created an AWS Lambda function using the **Python 3.10** runtime.
 5. Configured the Lambda execution role with the required IAM permissions.
-6. Added the Python function to process uploaded text files.
-7. Configured the Amazon S3 bucket to trigger the Lambda function whenever a new text file was uploaded.
+6. Added the Python function that processes uploaded text files and counts their words.
+7. Configured the S3 bucket to invoke Lambda when a new text file is uploaded.
 8. Uploaded a sample text file to the S3 bucket.
-9. Verified that the Lambda function automatically counted the words.
-10. Confirmed that Amazon SNS successfully delivered the word count result by email.
+9. Verified that the S3 event triggered the Lambda function and that the file was processed.
+10. Confirmed that SNS delivered the resulting word count by email.
 
----
+## Technical Context
 
-## Skills Demonstrated
+The workflow is event-driven: the file upload is the event, Lambda is the processing layer, and SNS is the notification layer.
 
-- Built and configured AWS Lambda functions
-- Developed an event-driven serverless application
-- Configured Amazon S3 event notifications
-- Created and managed Amazon SNS topics and subscriptions
-- Configured IAM execution roles and permissions
-- Tested Lambda functions using S3 events
-- Used Amazon CloudWatch Logs to investigate execution issues
-- Integrated multiple AWS services into a complete serverless workflow
+This removes the need for a continuously running server to watch the S3 bucket. Instead, S3 produces an event only when the relevant action occurs, and Lambda executes the processing logic in response.
 
----
+IAM provides the permissions that allow the Lambda function to interact with the other AWS services, while CloudWatch Logs provides visibility into function execution when something does not behave as expected.
 
----
+## Troubleshooting
 
-# Screenshots
-
-## Lambda Function Code
-
-![Lambda Function Code](screenshots/02wordcount-lambda-function-code.png)
-
-The AWS Lambda function contains the Python code responsible for counting the number of words in an uploaded text file.
-
----
-
-## Initial Function Test
-
-![Function Test Failed](screenshots/03-wordcount-function-test-failed.png)
-
-The initial test exposed an issue that was identified and resolved during troubleshooting. CloudWatch logs were used to diagnose the problem before redeploying the function.
-
----
-
-## Amazon S3 Trigger Configuration
-
-![S3 Trigger](screenshots/05-wordcount-lambda-s3-trigger.png)
-
-The Lambda function is configured with an Amazon S3 event notification, automatically invoking the function whenever a new text file is uploaded to the bucket.
-
----
-
-## Amazon SNS Email Notification
-
-![SNS Email Notification](screenshots/06-wordcount-sns-email-notification.png)
-
-After successfully processing the uploaded file, the Lambda function publishes the word count to an Amazon SNS topic, which delivers the result via email.
-
----
-
-## Challenges Encountered
-
-During testing, the Lambda function successfully executed but returned a **500 Internal Server Error** instead of processing the uploaded file successfully.
+During testing, the Lambda function initially returned a **500 Internal Server Error** instead of successfully processing the uploaded file.
 
 ### Investigation
 
-To identify the cause of the issue, I:
+I used the following checks to isolate the problem:
 
 - Reviewed the Lambda execution logs in Amazon CloudWatch.
 - Verified the IAM permissions assigned to the Lambda execution role.
@@ -123,17 +74,47 @@ To identify the cause of the issue, I:
 
 ### Resolution
 
-The issue was caused by an error in the Lambda function logic while processing the incoming event data. After correcting the function code and redeploying the application, the Lambda function successfully processed uploaded files and Amazon SNS delivered the word count results by email.
+The problem was caused by an error in the Lambda function logic while processing the incoming event data. After correcting the function code and redeploying it, the Lambda function successfully processed uploaded files and SNS delivered the word count results by email.
 
----
+## Screenshots
 
-## What I Learned
+### Lambda Function Code
 
-Through this project, I learned how to:
+![Lambda Function Code](screenshots/02wordcount-lambda-function-code.png)
 
-- Build event-driven serverless applications using AWS Lambda.
-- Automatically trigger Lambda functions using Amazon S3 events.
-- Send notifications using Amazon SNS.
-- Configure IAM permissions for serverless applications.
-- Use Amazon CloudWatch Logs to troubleshoot Lambda execution issues.
-- Understand how AWS services integrate to automate business workflows.
+The Lambda function contains the Python code responsible for counting the words in an uploaded text file.
+
+### Initial Function Test
+
+![Function Test Failed](screenshots/03-wordcount-function-test-failed.png)
+
+The initial test exposed the processing issue that was investigated using CloudWatch logs.
+
+### Amazon S3 Trigger Configuration
+
+![S3 Trigger](screenshots/05-wordcount-lambda-s3-trigger.png)
+
+The Lambda function is configured with an S3 event notification that invokes it when a new text file is uploaded.
+
+### Amazon SNS Email Notification
+
+![SNS Email Notification](screenshots/06-wordcount-sns-email-notification.png)
+
+After processing the uploaded file, Lambda publishes the word count to the SNS topic, which delivers the result by email.
+
+## Skills Demonstrated
+
+- Built and configured AWS Lambda functions
+- Designed an event-driven serverless workflow
+- Configured Amazon S3 event notifications
+- Created and managed Amazon SNS topics and subscriptions
+- Configured IAM execution roles and permissions
+- Tested Lambda functions using S3 events
+- Used Amazon CloudWatch Logs to troubleshoot execution issues
+- Integrated multiple AWS services into a complete automated workflow
+
+## Key Lessons Learned
+
+The project demonstrated how event-driven architecture can connect storage, compute, and notification services into a single workflow.
+
+It also reinforced the value of CloudWatch Logs during troubleshooting: when a Lambda invocation fails, execution logs can reveal whether the problem is related to application logic, permissions, configuration, or another part of the workflow.
