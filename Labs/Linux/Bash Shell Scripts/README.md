@@ -46,7 +46,7 @@ tar -tzf backups/<backup-file>.tar.gz
 
 The listing showed the `CompanyA` directory structure and its files without extracting the archive.
 
-## Evidence
+## Screenshots
 
 ### 1. Backup Script
 
