@@ -4,7 +4,7 @@
 
 AWS re/Start hands-on lab focused on diagnosing and repairing VPC connectivity problems using layered network reasoning and VPC Flow Logs.
 
-The lab involved two separate connectivity failures affecting the same EC2 web server. Rather than treating the symptoms as isolated problems, the investigation followed the packet through the VPC networking layers and used evidence to identify the failing control.
+The lab involved two separate connectivity failures affecting the same EC2 web server. Rather than treating the symptoms as isolated problems, the investigation followed the packet through the VPC networking layers and used observable results to identify the failing control.
 
 ## Objectives
 
@@ -35,7 +35,7 @@ The web server's public IP did not load in a browser. Initial network testing sh
 
 Security Group rules were considered first because TCP/80 access was failing.
 
-### Investigation / evidence
+### Investigation
 
 The web server Security Group already allowed inbound TCP/80 and TCP/22 from `0.0.0.0/0`, so the Security Group did not explain the HTTP failure.
 
@@ -68,7 +68,7 @@ The web server subsequently loaded successfully and returned:
 
 HTTP access was restored, but EC2 Instance Connect / SSH access to the web server still failed.
 
-### Investigation / evidence
+### Investigation
 
 The subnet's Network ACL contained an explicit inbound rule denying TCP/22 from `0.0.0.0/0`.
 
@@ -165,19 +165,13 @@ Web Server ENI
 - Route tables, NACLs, and Security Groups solve different parts of the packet's journey.
 - VPC Flow Logs are metadata about observed network flows, not packet captures.
 - Broad searches can create misleading forensic results; filtering on exact fields produces stronger evidence.
+- VPC Flow Logs can be correlated with AWS resource configuration to strengthen a root-cause diagnosis.
 - Network troubleshooting is more reliable when the packet path is followed layer by layer.
 
 ## Key Lesson
 
-The most important skill demonstrated was not memorizing AWS console steps. It was using observable evidence to move from symptom → hypothesis → diagnostic test → root cause → targeted fix → verification.
+The most important skill demonstrated was not memorizing AWS console steps. It was using observable results to move from symptom → hypothesis → diagnostic test → root cause → targeted fix → verification.
 
-## Portfolio Evidence
+## Screenshots
 
-Screenshots documenting the investigation and verification are included with this lab where available.
-
-1. Initial `nmap` host discovery and filtered-port evidence
-2. Route table showing the missing Internet Gateway route
-3. Web server restored after the route fix
-4. NACL showing the explicit SSH deny rule
-5. Successful SSH verification (`hostname` → `web-server`)
-6. VPC Flow Log evidence showing rejected TCP/22 traffic from the CLI Host to the Web Server
+The investigation is supported by screenshots showing the initial connectivity symptoms, the missing Internet Gateway route, the successful HTTP repair, the NACL SSH deny, successful SSH verification, and the rejected TCP/22 Flow Log records.
