@@ -82,9 +82,7 @@ EC2 resource usage
 CloudWatch CPU Utilization
 ```
 
-## Evidence
-
-The evidence from this lab is based on the actual service states, process activity, and CloudWatch metrics observed during the exercise. Screenshots were captured selectively rather than documenting every step of the lab.
+## Screenshots
 
 ### Apache Service — Initial State
 
@@ -133,7 +131,7 @@ The EC2 CloudWatch dashboard showed the corresponding CPU utilization spike, rea
 - Generated a controlled CPU workload
 - Monitored EC2 metrics with Amazon CloudWatch
 - Correlated host-level process activity with AWS monitoring data
-- Used observed system behaviour as troubleshooting evidence
+- Used observed system behaviour as troubleshooting data
 
 ## Key Lessons Learned
 
