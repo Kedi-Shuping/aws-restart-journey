@@ -164,7 +164,7 @@ Web Server ENI
 - A Security Group is an instance-level, stateful traffic filter.
 - Route tables, NACLs, and Security Groups solve different parts of the packet's journey.
 - VPC Flow Logs are metadata about observed network flows, not packet captures.
-- Broad searches can create misleading forensic results; filtering on exact fields produces stronger evidence.
+- Broad searches can create misleading forensic results; filtering on exact fields produces stronger forensic results.
 - VPC Flow Logs can be correlated with AWS resource configuration to strengthen a root-cause diagnosis.
 - Network troubleshooting is more reliable when the packet path is followed layer by layer.
 
@@ -174,4 +174,38 @@ The most important skill demonstrated was not memorizing AWS console steps. It w
 
 ## Screenshots
 
-The investigation is supported by screenshots showing the initial connectivity symptoms, the missing Internet Gateway route, the successful HTTP repair, the NACL SSH deny, successful SSH verification, and the rejected TCP/22 Flow Log records.
+### Initial connectivity symptoms
+
+The first test showed the difference between failed host discovery and a reachable host whose ports were being filtered.
+
+![Nmap host discovery versus port filtering](screenshots/01-nmap-host-discovery-vs-port-filtering.png)
+
+### Missing Internet Gateway route
+
+The associated public subnet route table contained the VPC local route but no default route to the Internet Gateway.
+
+![Route table missing Internet Gateway route](screenshots/02-route-table-missing-internet-gateway-route.png)
+
+### HTTP access restored
+
+After the routing path was repaired, the web server became reachable over HTTP.
+
+![Web server restored after route fix](screenshots/03-web-server-restored-after-route-fix.png)
+
+### NACL blocking SSH
+
+The Network ACL contained an explicit inbound deny for TCP/22. Because NACL rules are evaluated in ascending order, Rule 40 matched before the later allow rule.
+
+![NACL inbound SSH deny rule](screenshots/04-nacl-inbound-ssh-deny-rule.png)
+
+### SSH access restored
+
+Removing the offending NACL rule restored SSH access to the web server.
+
+![SSH access restored after NACL fix](screenshots/05-ssh-access-restored-nacl-fix.png)
+
+### Flow Log forensic correlation
+
+The Flow Log records captured the relevant CLI Host to Web Server TCP/22 attempts as `REJECT`, providing network-level corroboration of the failed SSH connection.
+
+![VPC Flow Log rejected SSH evidence](screenshots/06-vpc-flow-log-rejected-ssh-evidence.png)
