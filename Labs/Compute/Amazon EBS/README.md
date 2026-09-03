@@ -4,10 +4,6 @@
 
 This lab demonstrated how Amazon Elastic Block Store (EBS) provides persistent block storage for Amazon EC2. I created an EBS volume, attached it to an EC2 instance, formatted and mounted it in Linux, wrote data to the volume, and then used an EBS snapshot to restore that data to a new volume.
 
-## Training Evidence
-
-**AWS Re/Start lab:** Working with Amazon EBS
-
 ## AWS Services and Components Used
 
 - Amazon EBS
@@ -36,9 +32,7 @@ The exercise also demonstrated the relationship between an EBS volume and its sn
 
 On the Linux side, the exercise required creating a filesystem, mounting the block device, configuring `/etc/fstab`, and using standard Linux commands to verify storage and data.
 
-## Evidence
-
-The screenshots below highlight the key configuration and validation steps from the completed lab.
+## Screenshots
 
 ### 1. EBS Volume Attached to EC2
 
