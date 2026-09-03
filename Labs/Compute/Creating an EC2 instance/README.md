@@ -1,12 +1,12 @@
 # Deploying and Managing an Amazon EC2 Web Server
 
-## Project Overview
+## Overview
 
-In this lab, I deployed an Amazon EC2 instance running Amazon Linux 2023 and configured it as a simple Apache web server using a User Data Bash script. I also monitored the instance, updated security settings, resized compute and storage resources, and tested termination protection.
+This project demonstrates the deployment and lifecycle management of an Amazon EC2 web server running Amazon Linux 2023.
 
----
+I configured Apache using EC2 User Data, allowed HTTP access through a Security Group, monitored the instance, resized both compute and storage resources, and tested termination protection.
 
-## AWS Services Used
+## AWS Services and Components Used
 
 - Amazon EC2
 - Amazon EBS
@@ -15,23 +15,41 @@ In this lab, I deployed an Amazon EC2 instance running Amazon Linux 2023 and con
 - Amazon Machine Image (AMI)
 - Amazon CloudWatch
 
----
+## Project Workflow
 
-## Skills Demonstrated
+1. Launched an EC2 instance using an Amazon Linux 2023 AMI.
+2. Configured the instance's Security Group to allow HTTP traffic.
+3. Used EC2 User Data with Bash to deploy Apache during instance initialization.
+4. Monitored the instance's health and status.
+5. Used Amazon CloudWatch to observe the instance from the AWS monitoring layer.
+6. Expanded the attached EBS volume.
+7. Changed the EC2 instance type to demonstrate compute resizing.
+8. Enabled termination protection and tested its effect on the instance lifecycle.
+9. Disabled termination protection and terminated the instance as part of cleanup.
 
-- Launching an EC2 instance
-- Selecting an Amazon Machine Image (AMI)
-- Choosing an EC2 instance type
-- Configuring Security Groups
-- Configuring Amazon EBS storage
-- Deploying Apache using User Data
-- Monitoring EC2 health and status
-- Allowing HTTP access through Security Groups
-- Resizing an EC2 instance
-- Expanding an Amazon EBS volume
-- Enabling and testing termination protection
+## Technical Context
 
----
+This project demonstrates how several AWS components work together to deliver and manage a basic web server:
+
+```text
+Amazon VPC
+    │
+    ▼
+EC2 Instance ─── Security Group ─── HTTP access
+    │
+    ├── Amazon EBS ─── persistent block storage
+    │
+    └── User Data ─── Apache installation/configuration
+            │
+            ▼
+      Web Server
+
+EC2 ─── CloudWatch ─── instance monitoring
+```
+
+EC2 provides the compute capacity, while EBS supplies persistent block storage attached to the instance. The Security Group controls network access to the instance, and User Data provides automated initialization when the instance launches.
+
+The exercise also demonstrated that EC2 resources can be modified after deployment. Compute capacity can be changed by selecting another instance type, while attached EBS storage can be expanded independently. Termination protection provides an additional safeguard against accidental instance deletion.
 
 ## Screenshots
 
@@ -44,7 +62,7 @@ In this lab, I deployed an Amazon EC2 instance running Amazon Linux 2023 and con
 ### EC2 Monitoring
 ![EC2 Monitoring](screenshots/ec2-monitoring.png)
 
-### CloudWatch Instance Screenshot
+### CloudWatch Monitoring
 ![CloudWatch Instance Screenshot](screenshots/ec2-cloudwatch-instance-screenshot.png)
 
 ### EBS Volume Resized
@@ -58,6 +76,23 @@ In this lab, I deployed an Amazon EC2 instance running Amazon Linux 2023 and con
 
 ### EC2 Instance Terminated
 ![EC2 Instance Terminated](screenshots/ec2-instance-terminated.png)
-## Outcome
 
-Successfully deployed, monitored, secured, resized, and managed an Amazon EC2 web server while gaining hands-on experience with compute, networking, storage, and instance lifecycle management in AWS.
+## Skills Demonstrated
+
+- Launched and configured an EC2 instance
+- Selected an appropriate Amazon Machine Image (AMI)
+- Configured Security Groups for HTTP access
+- Used EC2 User Data for automated server initialization
+- Deployed Apache on Amazon Linux
+- Monitored EC2 health and resource activity
+- Used Amazon CloudWatch for instance monitoring
+- Resized EC2 compute resources
+- Expanded Amazon EBS storage
+- Enabled and tested EC2 termination protection
+- Managed the EC2 instance lifecycle from deployment through termination
+
+## Key Lessons Learned
+
+EC2 is not an isolated compute resource. A functioning web server depends on the relationship between the instance, its network access controls, attached storage, initialization process, and monitoring tools.
+
+The project also reinforced the value of automation during deployment. Using User Data allowed the web server configuration to begin automatically as part of instance initialization rather than requiring every setup command to be performed manually.
