@@ -18,6 +18,8 @@ The initial CloudFormation deployment reached a rollback state after the WaitCon
 
 Rather than allowing the failed resources to disappear, I recreated the stack with `DO_NOTHING` so the EC2 instance could be investigated directly.
 
+![CloudFormation stack failure with resources retained](screenshots/01-CloudFormation-stack-failure-with-resources-retained.png)
+
 ### Investigating the EC2 bootstrap process
 
 The EC2 instance was accessed through SSH and the cloud-init output was inspected with elevated permissions:
@@ -65,6 +67,8 @@ WaitCondition timed out
 CloudFormation deployment failed
 ```
 
+![EC2 cloud-init log reveals invalid http package](screenshots/02-EC2-cloud-init-log-reveals-invalid-http-package.png)
+
 ### Correcting the template
 
 I corrected the package installation command in the CloudFormation template:
@@ -80,6 +84,8 @@ cat template1.yaml | grep httpd
 ```
 
 The corrected template was redeployed and the resources reached `CREATE_COMPLETE`.
+
+![CloudFormation corrected stack resources created successfully](screenshots/03-CloudFormation-corrected-stack-resources-created-successfully.png)
 
 The CloudFormation outputs provided the S3 bucket name and EC2 public IP. I opened the deployed web server and verified that it returned:
 
@@ -100,6 +106,8 @@ After the successful deployment, I manually changed the WebServerSG inbound SSH 
 to the user's IP address.
 
 I then created an object in the CloudFormation-managed S3 bucket and used the AWS CLI to inspect the stack and its resources.
+
+![CloudFormation drift detected in security group](screenshots/04-CloudFormation-drift-detected-in-security-group.png)
 
 ### Detecting drift
 
@@ -162,6 +170,8 @@ aws cloudformation delete-stack \
 
 The stack was removed while the bucket and its object remained available for cleanup.
 
+![CloudFormation stack deleted while S3 bucket retained](screenshots/05-CloudFormation-stack-deleted-while-S3-bucket-retained.png)
+
 I subsequently removed the retained S3 bucket and its contents manually:
 
 ```bash
@@ -169,72 +179,6 @@ aws s3 rb s3://mystack-mybucket-msdsdlihmsvf/ --force
 ```
 
 Final checks confirmed that the CloudFormation stack and S3 bucket had been removed.
-
-## Screenshots
-
-The screenshots below capture the key troubleshooting and validation points from the lab.
-
-### 1. CloudFormation stack failure with resources retained
-
-Shows the failed CloudFormation deployment with resources preserved for investigation.
-
-![CloudFormation stack failure with resources retained](screenshots/01-CloudFormation-stack-failure-with-resources-retained.png)
-
----
-
-### 2. EC2 cloud-init log reveals invalid package
-
-Shows the EC2 cloud-init output identifying the failed `http` package installation.
-
-![EC2 cloud-init log reveals invalid http package](screenshots/02-EC2-cloud-init-log-reveals-invalid-http-package.png)
-
----
-
-### 3. Corrected CloudFormation stack created successfully
-
-Shows the corrected stack resources reaching successful creation.
-
-![CloudFormation corrected stack resources created successfully](screenshots/03-CloudFormation-corrected-stack-resources-created-successfully.png)
-
----
-
-### 4. Web server successfully deployed
-
-Shows the deployed web server returning the expected page.
-
-![Web server successfully deployed and serving page](screenshots/04-Web-server-successfully-deployed-and-serving-page.png)
-
----
-
-### 5. CloudFormation security group manually modified
-
-Shows the security group change that introduced configuration drift.
-
-![CloudFormation security group manually modified](screenshots/05-CloudFormation-security-group-manually-modified.png)
-
----
-
-### 6. CloudFormation drift detected
-
-Shows the stack reporting drift after the security group was changed outside CloudFormation.
-
-![CloudFormation drift detected in security group](screenshots/06-CloudFormation-drift-detected-in-security-group.png)
-
----
-
-### 7. Security group drift identified
-
-Shows the SSH source difference identified through resource-level drift information.
-
-![Security group drift shows SSH source changed](screenshots/07-Security-group-drift-shows-SSH-source-changed.png)
-
----
-
-### 8. CloudFormation stack deleted while S3 bucket retained
-
-Shows the controlled stack deletion with the S3 bucket retained for cleanup.
-
-![CloudFormation stack deleted while S3 bucket retained](screenshots/08-CloudFormation-stack-deleted-while-S3-bucket-retained.png)
 
 ## Key Technical Takeaways
 
