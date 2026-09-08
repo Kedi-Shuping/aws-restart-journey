@@ -18,7 +18,7 @@ The initial CloudFormation deployment reached a rollback state after the WaitCon
 
 Rather than allowing the failed resources to disappear, I recreated the stack with `DO_NOTHING` so the EC2 instance could be investigated directly.
 
-![CloudFormation stack failure with resources retained](screenshots/01-CloudFormation-stack-failure-with-resources-retained.png)
+![CloudFormation stack failure with resources retained](screenshots/01-CloudFormation%20stack%20failure%20with%20resources%20retained.png)
 
 ### Investigating the EC2 bootstrap process
 
@@ -67,7 +67,7 @@ WaitCondition timed out
 CloudFormation deployment failed
 ```
 
-![EC2 cloud-init log reveals invalid http package](screenshots/02-EC2-cloud-init-log-reveals-invalid-http-package.png)
+![EC2 cloud-init log reveals invalid http package](screenshots/02-EC2%20cloud-init%20log%20reveals%20invalid%20http%20package.png)
 
 ### Correcting the template
 
@@ -85,7 +85,7 @@ cat template1.yaml | grep httpd
 
 The corrected template was redeployed and the resources reached `CREATE_COMPLETE`.
 
-![CloudFormation corrected stack resources created successfully](screenshots/03-CloudFormation-corrected-stack-resources-created-successfully.png)
+![CloudFormation corrected stack resources created successfully](screenshots/03-CloudFormation%20corrected%20stack%20resources%20created%20successfully.png)
 
 The CloudFormation outputs provided the S3 bucket name and EC2 public IP. I opened the deployed web server and verified that it returned:
 
@@ -107,7 +107,7 @@ to the user's IP address.
 
 I then created an object in the CloudFormation-managed S3 bucket and used the AWS CLI to inspect the stack and its resources.
 
-![CloudFormation drift detected in security group](screenshots/06-CloudFormation-drift-detected-in-security-group.png)
+![CloudFormation drift detected in security group](screenshots/06-CloudFormation%20drift%20detected%20in%20security%20group.png)
 
 ### Detecting drift
 
@@ -170,7 +170,7 @@ aws cloudformation delete-stack \
 
 The stack was removed while the bucket and its object remained available for cleanup.
 
-![CloudFormation stack deleted while S3 bucket retained](screenshots/08-CloudFormation-stack-deleted-while-S3-bucket-retained.png)
+![CloudFormation stack deleted while S3 bucket retained](screenshots/08-CloudFormation%20stack%20deleted%20while%20S3%20bucket%20retained.png)
 
 I subsequently removed the retained S3 bucket and its contents manually:
 
