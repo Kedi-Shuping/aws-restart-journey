@@ -107,7 +107,7 @@ to the user's IP address.
 
 I then created an object in the CloudFormation-managed S3 bucket and used the AWS CLI to inspect the stack and its resources.
 
-![CloudFormation drift detected in security group](screenshots/04-CloudFormation-drift-detected-in-security-group.png)
+![CloudFormation drift detected in security group](screenshots/06-CloudFormation-drift-detected-in-security-group.png)
 
 ### Detecting drift
 
@@ -170,7 +170,7 @@ aws cloudformation delete-stack \
 
 The stack was removed while the bucket and its object remained available for cleanup.
 
-![CloudFormation stack deleted while S3 bucket retained](screenshots/05-CloudFormation-stack-deleted-while-S3-bucket-retained.png)
+![CloudFormation stack deleted while S3 bucket retained](screenshots/08-CloudFormation-stack-deleted-while-S3-bucket-retained.png)
 
 I subsequently removed the retained S3 bucket and its contents manually:
 
