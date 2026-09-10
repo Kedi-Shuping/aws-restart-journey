@@ -24,7 +24,7 @@ One thing I noticed during the exercise was the difference between `45` and `"45
 
 This exercise reinforced that a Python list does not have to contain values of only one data type. Different kinds of values can exist together in the same list, and a loop can process each element in turn.
 
-It also showed me how `type()` can be used to inspect what Python is actually storing. That makes the distinction between similar-looking values much easier to see in a running program.
+It also showed me how `type()` can be used to inspect what Python is actually storing. That makes the difference between similar-looking values much easier to see in a running program.
 
 The exercise is small, but it brings together lists, loops, data types, and formatted output in one working example.
 
