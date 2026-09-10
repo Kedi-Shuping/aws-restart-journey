@@ -16,11 +16,11 @@ My goal is to continue learning, earn AWS certifications, and build secure, scal
 
 ---
 
-My Learning Approach
+## My Learning Approach
 
-Throughout the AWS re/Start programme, I focus on understanding how AWS services work together rather than simply completing labs. I enjoy exploring the architecture behind cloud solutions and documenting what I learn through hands-on practice.
+Throughout the AWS re/Start programme, I focus on understanding how cloud systems work and the reasoning behind the solutions. I enjoy exploring the architecture behind cloud solutions and documenting what I learn through hands-on practice.
 
-When I encounter challenges, I research AWS documentation and other technical resources to deepen my understanding and troubleshoot problems independently. Each lab in this portfolio is documented with the AWS services used, the skills demonstrated, and the key lessons I learned.
+When I encounter challenges, I investigate the problem, test different approaches, and use technical resources when they help me understand what is happening and work towards a solution. Each lab in this portfolio is documented with the AWS services used, the skills developed, and the key lessons learned.
 
 ---
 
