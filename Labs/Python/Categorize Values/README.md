@@ -18,7 +18,7 @@ The script stores six values in `myMixedTypeList`: two integers, a floating-poin
 
 A `for` loop visits each item in the list one at a time. For each item, the `type()` function identifies the data type, and `.format()` is used to include that information in the output.
 
-One useful part of the exercise is the difference between `45` and `"45"`. The first is an integer because it is written as a numeric value. The second is a string because it is enclosed in quotation marks. Python therefore treats them as different data types even though they look similar when displayed.
+One thing I noticed during the exercise was the difference between `45` and `"45"`. The first is an integer because it is written as a numeric value. The second is a string because it is enclosed in quotation marks. Python therefore treats them as different data types even though they look similar when displayed.
 
 ## What I learned
 
