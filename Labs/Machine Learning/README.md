@@ -1,38 +1,26 @@
 # Machine Learning
 
-This section documents my machine learning learning journey through AWS re/Start, including core concepts, AWS services, and practical exercises.
+My hands-on machine learning work so far has been one AWS re/Start lab: training an XGBoost model in Amazon SageMaker.
 
-The goal is to understand not only the terminology, but also the problem each technique solves, how it works, and where it fits into a cloud architecture.
+That is a small start, so this page focuses on what I actually did rather than listing every ML service covered in the course as if I had used them all.
 
-## Core Concepts
+## Training an XGBoost Model
 
-- **Types of learning:** supervised and unsupervised learning, including the role of labelled and unlabelled data.
-- **Model tasks:** classification, regression, and clustering.
-- **Model evaluation:** confusion matrices, true positives, true negatives, false positives, and false negatives.
-- **Data preparation:** why data quality and preparation matter before training or evaluating a model.
+I used training and validation data stored in Amazon S3 and configured a SageMaker XGBoost training job. SageMaker ran the job, and the final resource status was **Completed**.
 
-## AWS Services and Tools
+The exercise gave me practical exposure to the path from data stored in S3 to a model-training job running in SageMaker. It also helped connect the algorithm being used—XGBoost—with the AWS services providing the data and compute environment.
 
-Learning topics include:
+A completed training job tells me the training process ran to completion. By itself, it does not tell me how well the model performs; that depends on evaluating its results against appropriate data and metrics.
 
-- **Amazon Rekognition** — image and video analysis.
-- **Amazon Comprehend** — natural-language processing and text insights.
-- **Amazon SageMaker** — tools for building, preparing, training, evaluating, and deploying machine learning workflows.
-- **SageMaker Data Wrangler** — preparing and transforming data for machine learning.
-- **SageMaker Clarify** — examining potential bias and explaining model predictions.
-- **SageMaker JumpStart** — discovering and starting with foundation models and prebuilt machine learning solutions.
-- **Amazon Bedrock** — building generative AI applications with foundation models.
+## Concepts Connected to the Lab
 
-## Learning Notes
+- **Training and validation data:** the model-training workflow uses separate data for fitting the model and checking it during development.
+- **XGBoost:** a gradient-boosted decision-tree algorithm used for supervised learning.
+- **Amazon S3:** the storage location for the data used by the training job.
+- **Amazon SageMaker:** the managed environment used to run the training job.
 
-For each topic or exercise, I aim to capture:
+## What I Want to Practise Next
 
-1. **Problem** — what needed to be solved.
-2. **Why it matters** — the practical reason for the technique or service.
-3. **How it works** — the underlying mechanism, explained in plain language.
-4. **Architecture** — where it fits in a wider solution.
-5. **Key takeaway** — what I learned and what I would investigate next.
+My next step is to build more ML experience beyond this one training exercise. I want to work through the process more independently in Python, evaluate model performance, experiment with model settings, and then build another end-to-end workflow in AWS.
 
-## Status
-
-This is a learning section, not a claim that every listed service or technique has been used in a production project. Notes and lab write-ups will be added as the learning journey progresses.
+As I complete those exercises, I'll add the code, results, and lessons learned here. For now, this page records one completed training lab—not a claim of broad hands-on experience across AWS machine learning services.
