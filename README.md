@@ -44,16 +44,15 @@ When I encounter challenges, I investigate the problem, test different approache
 - Bash
 - Python
 
-
 ---
 
-##  Repository Structure
+## Repository Structure
 
-```
-Labs/
-Projects/
-Certifications/
-```
+- [Labs](Labs/) — hands-on exercises organised by topic.
+- [Machine Learning](Labs/Machine%20Learning/) — machine learning concepts, AWS tools, and learning notes.
+- [Projects](Projects/) — larger practical projects.
+- [Certifications](Certifications/) — certification progress and evidence.
+
 ## Skills Demonstrated
 
 - AWS Cloud Infrastructure Deployment
@@ -65,12 +64,13 @@ Certifications/
 - Database Design
 - Networking Fundamentals
 - Serverless Computing
+- Machine Learning Fundamentals
 - Troubleshooting
 - Technical Documentation
 
 ---
 
-##  Current Learning Goals
+## Current Learning Goals
 
 - Complete AWS re/Start
 - Build hands-on AWS projects
@@ -78,4 +78,3 @@ Certifications/
 - Continue growing my cloud engineering portfolio
 
 ---
-
