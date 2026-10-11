@@ -2,7 +2,7 @@
 
 *An adaptive communication and emotional-regulation app built for my daughter, who was working through a speech delay.*
 
-Sootheum is a single-file progressive web app with six story books, five voice games, a calm corner for emotional regulation, and a custom "Mommy's Voice" feature. It was built incrementally over several months, guided by what actually worked for her. She now talks. This project is closed on her terms.
+Sootheum is a single-file progressive web app with six story books, five voice games, a calm corner for emotional regulation, and a custom "Mommy's Voice" feature — 126 pages of recorded narration across six books, so every story plays in a familiar voice. It was built incrementally over several months, guided by what actually worked for her. She now talks. This project is closed on her terms.
 
 ---
 
@@ -65,26 +65,32 @@ No application code changed. The fix was purely architectural.
 - **Deployment architecture.** S3 origin + CloudFront distribution + HTTPS via managed certificate, with awareness of edge caching implications.
 - **Diagnostic discipline.** Distinguishing "broken code" from "code that violates an environment-level browser requirement."
 
+## Technical Notes
+
+### Narration
+
+Every story page has a narration path. When present, the app plays the recorded file (a familiar voice reading the page). When a narration path is absent, the story reader falls back to the browser's native text-to-speech API. This keeps every story functional for any reader, regardless of whether narration has been recorded.
+
+### Voice sensitivity
+
+The Voice Power game measures microphone input amplitude in real time via the Web Audio API, using a smoothed RMS calculation with a moving average over several frames. Sensitivity is set as a configurable constant (default 25) rather than a hardcoded threshold — it was tuned to suit a child working on projection and vocal volume. The mechanism supports future tuning for different voices and environments.
+
 ## Troubleshooting
 
 ### Microphone access denied despite granted permission
 
 The browser's permission prompt appeared and was accepted, but `getUserMedia()` still rejected. Investigation showed the site was being served over `http://`, which does not qualify as a secure context. Moving the site behind a CloudFront distribution resolved the issue without any code changes.
 
-### Story narration audio failed silently
-
-Some narration files were missing from the `sounds/` directory. The story reader included a fallback to the browser's native text-to-speech API (`speechSynthesis`), which meant the app remained functional even when audio assets were missing. This was verified by deliberately removing a narration file and confirming the TTS fallback engaged.
-
 ### Voice-powered flower game counted noise as input
 
-Initial sensitivity thresholds were too low, causing background noise to trigger the flower growth mechanic. The amplitude calculation was adjusted to require sustained input above threshold — using a moving average across several frames — rather than any single frame above the threshold.
+Initial sensitivity thresholds were too low, causing background noise to trigger the flower growth mechanic. The amplitude calculation was adjusted to require sustained input above threshold — using a moving average across several frames — rather than any single frame above the threshold. The final threshold value was set to 25 after tuning for a specific child's voice.
 
 ## Verification
 
 - Microphone input successfully captured after deployment behind CloudFront.
 - Voice-powered game responded correctly to live voice input.
 - Voice recording and playback worked end-to-end in a secure context.
-- TTS fallback confirmed by removing a narration file and observing correct behavior.
+- Text-to-speech fallback confirmed by testing a story page without a narration path.
 - All story books, games, and calm corner features tested on desktop and mobile.
 
 ## Screenshots
