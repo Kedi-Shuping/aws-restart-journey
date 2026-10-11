@@ -1,4 +1,4 @@
-# Ubuntu Braai & Lounge
+# Ubuntu Braai
 
 A collaborative restaurant website project for Ubuntu Braai & Lounge in Bloemfontein.
 
