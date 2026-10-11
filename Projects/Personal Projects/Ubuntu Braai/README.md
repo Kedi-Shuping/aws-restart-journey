@@ -12,9 +12,9 @@ Customers sign in, browse the menu, place an order, and view their order history
 
 The email on an order is not sent by the browser. The Lambda reads it from the Cognito JWT, so the customer's identity comes from the token rather than from anything the client claims.
 
-The reservation form on the homepage has client-side validation and a confirmation message. It is presentation-only — I haven't wired it to a backend yet.
+The reservation form on the homepage has client-side validation and a confirmation message. It is presentation-only — there is no backend integration for reservations yet.
 
-**Live website:** [Ubuntu Braai & Lounge](http://ubuntu-braai.s3-website.eu-north-1.amazonaws.com/)
+**Live website:** [Ubuntu Braai & Lounge](https://d10m2glnu4j9zd.cloudfront.net/)
 
 ## Skills Demonstrated
 
@@ -58,6 +58,17 @@ The cause was in the table itself. The partition key had been created as `rderNu
 I found it by opening a single item in the Console and reading the key names character by character. I deleted the table, recreated it with `orderNumber` as the partition key, recreated the GSI, and everything started flowing.
 
 What I'd do differently: the Console's create-table form doesn't validate against the code. A one-character typo in a key name behaves exactly like a code bug. Compare the table's key names against the `PutCommand` and `QueryCommand` strings in the Lambda the same way I'd compare a URL.
+
+
+### CloudFront returned 504 timeouts fetching from the S3 website endpoint
+
+After moving the site behind CloudFront for HTTPS, every request through the CloudFront URL returned `504 Gateway Timeout`. The S3 website endpoint itself was still working — a direct request to `http://ubuntu-braai.s3-website.eu-north-1.amazonaws.com/` returned the homepage normally.
+
+The cause was the origin protocol. CloudFront's Console had defaulted the origin to **HTTPS only**, but the S3 *website* endpoint only serves HTTP. CloudFront was trying to connect over HTTPS, getting no response, and timing out after 30 seconds.
+
+The fix was to set the origin protocol to **HTTP only**. Browser-to-CloudFront traffic stays HTTPS, and CloudFront-to-S3 runs inside AWS's network. No security tradeoff.
+
+What I'd do differently: when using the S3 website endpoint as a CloudFront origin, check the origin protocol before the distribution goes live. The Console allows the wrong setting at creation time and only greys it out later. This is the same trap that cost time on the CLF trainer — same root cause, different symptom (403 there, 504 here).
 
 ## What I Learned
 
