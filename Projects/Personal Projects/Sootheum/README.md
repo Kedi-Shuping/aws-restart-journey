@@ -1,11 +1,126 @@
 # Sootheum
 
-Sootheum is a voice-powered learning app created to support a child with speech delays through stories, games, recorded audio, and interactive learning activities.
+*An adaptive communication and emotional-regulation app built for my daughter, who was working through a speech delay.*
+
+Sootheum is a single-file progressive web app with six story books, five voice games, a calm corner for emotional regulation, and a custom "Mommy's Voice" feature. It was built incrementally over several months, guided by what actually worked for her. She now talks. This project is closed on her terms.
+
+---
 
 ## Overview
 
-The project demonstrates front-end development and AWS static hosting/content delivery using Amazon S3 and Amazon CloudFront.
+Several features in Sootheum depend on live microphone input: a voice-powered game where a flower grows as the child speaks affirmations, a recording studio with playback and audio effects, and a sequencing game that listens for spoken steps. All of these failed silently when the app was served from a local development environment or from a plain HTTP endpoint.
 
-## Project documentation
+This writeup documents the cause and the architectural fix.
 
-The portfolio entry will document the app's purpose, architecture, features, technical decisions, challenges, and lessons learned. Sensitive personal details and private user data should not be included in public evidence.
+## The Problem
+
+`navigator.mediaDevices.getUserMedia()` returned a permission error — even when the browser's microphone permission was explicitly granted for the site. The application's fallback paths activated silently (e.g. "tap to grow" instead of listening for voice).
+
+## The Cause
+
+`getUserMedia()` is gated on a **secure context**. The browser only exposes microphone and camera access when the page is served from:
+
+- `https://` — any TLS-secured origin
+- `http://localhost` — an explicit browser exemption for development
+
+All other origins — plain `http://`, `file://` in some browsers, and any non-trustworthy context — silently deny access. No console error by default. Just a rejected promise.
+
+The app was deployed to a plain S3 static website endpoint, which serves over `http://`. The browser had no way to verify the site was legitimate, so it refused to grant sensor access. The code was correct. The environment was wrong.
+
+## The Fix
+
+Move the site behind Amazon CloudFront.
+
+CloudFront provides two things that solved the problem:
+
+- **HTTPS by default.** Every CloudFront distribution gets a `*.cloudfront.net` subdomain with a managed TLS certificate, putting the site into a secure context.
+- **Edge caching.** Static assets are cached at AWS edge locations worldwide, reducing latency and origin load.
+
+No application code changed. The fix was purely architectural.
+
+## Architecture
+
+    Browser
+      │  HTTPS
+      ▼
+    CloudFront distribution
+      │  HTTPS (origin fetch)
+      ▼
+    Amazon S3 bucket
+      │
+      ├── index.html   (single-file app)
+      ├── sounds/      (mp3: narration, ambient, comfort)
+      └── images/      (scene backgrounds, UI artwork)
+
+## AWS Services and Tools Used
+
+- Amazon S3 (static origin)
+- Amazon CloudFront (HTTPS termination + CDN)
+- Web Audio API (live microphone amplitude analysis)
+- Web MediaRecorder API (voice recording and playback)
+
+## What This Demonstrates
+
+- **Browser security model.** Understanding that sensor APIs are gated on secure contexts, and that the correct response is to fix the environment rather than work around the API.
+- **Deployment architecture.** S3 origin + CloudFront distribution + HTTPS via managed certificate, with awareness of edge caching implications.
+- **Diagnostic discipline.** Distinguishing "broken code" from "code that violates an environment-level browser requirement."
+
+## Troubleshooting
+
+### Microphone access denied despite granted permission
+
+The browser's permission prompt appeared and was accepted, but `getUserMedia()` still rejected. Investigation showed the site was being served over `http://`, which does not qualify as a secure context. Moving the site behind a CloudFront distribution resolved the issue without any code changes.
+
+### Story narration audio failed silently
+
+Some narration files were missing from the `sounds/` directory. The story reader included a fallback to the browser's native text-to-speech API (`speechSynthesis`), which meant the app remained functional even when audio assets were missing. This was verified by deliberately removing a narration file and confirming the TTS fallback engaged.
+
+### Voice-powered flower game counted noise as input
+
+Initial sensitivity thresholds were too low, causing background noise to trigger the flower growth mechanic. The amplitude calculation was adjusted to require sustained input above threshold — using a moving average across several frames — rather than any single frame above the threshold.
+
+## Verification
+
+- Microphone input successfully captured after deployment behind CloudFront.
+- Voice-powered game responded correctly to live voice input.
+- Voice recording and playback worked end-to-end in a secure context.
+- TTS fallback confirmed by removing a narration file and observing correct behavior.
+- All story books, games, and calm corner features tested on desktop and mobile.
+
+## Screenshots
+
+### Home
+
+![Sootheum home screen](Screenshots/01-home.png)
+
+### Voice Power
+
+The flower grows as the child speaks affirmations. Real-time microphone analysis via the Web Audio API.
+
+![Voice Power game](Screenshots/02-voice-power.png)
+
+### Story Library
+
+Six original story books, each written with a specific speech or emotional milestone in mind.
+
+![Story library](Screenshots/03-story-library.png)
+
+### My Voice
+
+Two modes: guided practice ("Say It with Me") and open recording ("Your Turn to Talk"). This is the screen the HTTPS fix was for.
+
+![My Voice screen](Screenshots/04-my-voice.png)
+
+### Calm Corner
+
+Regulation tools: breathing guide, glitter jar, ambient nature sounds, and a recording of the child's mother's voice for comfort.
+
+![Calm Corner](Screenshots/05-calm-corner.png)
+
+## Live
+
+Live at: https://d1m0wbmrmfzbc8z.cloudfront.net
+
+---
+
+*Built for a little girl who now talks.*
