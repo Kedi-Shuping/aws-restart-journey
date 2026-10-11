@@ -10,7 +10,7 @@ Sootheum is a single-file progressive web app with six story books, five voice g
 
 Several features in Sootheum depend on live microphone input: a voice-powered game where a flower grows as the child speaks affirmations, a recording studio with playback and audio effects, and a sequencing game that listens for spoken steps. All of these failed silently when the app was served from a local development environment or from a plain HTTP endpoint.
 
-This writeup documents the cause and the architectural fix.
+This README documents the cause and the architectural fix.
 
 ## The Problem
 
@@ -29,7 +29,7 @@ The app was deployed to a plain S3 static website endpoint, which serves over `h
 
 ## The Fix
 
-Move the site behind Amazon CloudFront.
+I Moved the site behind Amazon CloudFront.
 
 CloudFront provides two things that solved the problem:
 
