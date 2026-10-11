@@ -80,7 +80,7 @@ What I'd do differently: when using the S3 website endpoint as a CloudFront orig
 
 ## Verification
 
-- The site loads from the S3 endpoint.
+- The site loads over HTTPS through CloudFront
 - Cognito sign-in works, the session persists across pages, and logout clears the Cognito session keys from local storage so the site doesn't silently re-authenticate on return.
 - Order submission writes to DynamoDB and returns a server-generated order number.
 - The dashboard retrieves and displays orders by email, and a new order appears immediately.
