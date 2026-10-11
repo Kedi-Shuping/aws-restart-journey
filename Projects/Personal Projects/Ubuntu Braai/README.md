@@ -1,7 +1,8 @@
 
 # Ubuntu Braai & Lounge
 
-*A full-stack restaurant website built to practise AWS serverless architecture and connect cloud services end to end.*
+
+*A full-stack restaurant website built to demonstrate AWS serverless architecture and end-to-end cloud service integration.*
 
 ## Overview
 
