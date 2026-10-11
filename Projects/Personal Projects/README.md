@@ -4,7 +4,7 @@ This section brings together personal projects that demonstrate practical skills
 
 ## Projects
 
-- [Ubuntu Braai & Lounge](Ubuntu%20Braai%20%26%20Lounge/) — website and cloud-hosting project.
+- [Ubuntu Braai](Ubuntu%20Braai) — website and cloud-hosting project.
 - [Sootheum](Sootheum/) — a voice-powered learning app built to support children with speech delays.
 - [Machine Learning Personal Project](Machine%20Learning%20Personal%20Project/) — **Coming soon.** This space is reserved for a hands-on machine-learning project.
 
