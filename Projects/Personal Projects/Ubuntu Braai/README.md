@@ -12,6 +12,8 @@ Customers sign in, browse the menu, place an order, and view their order history
 
 The email on an order is not sent by the browser. The Lambda reads it from the Cognito JWT, so the customer's identity comes from the token rather than from anything the client claims.
 
+![Homepage](Screenshots/01-home-cloudfront.png)
+
 The reservation form on the homepage has client-side validation and a confirmation message. It is presentation-only — there is no backend integration for reservations yet.
 
 **Live website:** [Ubuntu Braai & Lounge](https://d10m2glnu4j9zd.cloudfront.net/)
@@ -82,3 +84,5 @@ What I'd do differently: when using the S3 website endpoint as a CloudFront orig
 - Cognito sign-in works, the session persists across pages, and logout clears the Cognito session keys from local storage so the site doesn't silently re-authenticate on return.
 - Order submission writes to DynamoDB and returns a server-generated order number.
 - The dashboard retrieves and displays orders by email, and a new order appears immediately.
+
+  ![Dashboard with order history](Screenshots/02-dashboard-orders.png)
