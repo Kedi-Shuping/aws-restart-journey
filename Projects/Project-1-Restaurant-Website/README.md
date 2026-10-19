@@ -31,13 +31,18 @@ The order flow runs end to end. The browser sends an authenticated request to AP
 The email attached to an order is read from the Cognito token rather than sent by the browser. The backend therefore uses the identity asserted by the token issuer instead of trusting a client-supplied email address.
 
 ```mermaid
-flowchart LR
-    C[Customer] --> CF[CloudFront]
-    CF --> S3[S3 website]
-    C --> API[API Gateway]
-    Auth[Cognito JWT] --> API
-    API --> L[Lambda]
-    L <--> DB[(DynamoDB<br/>Orders + email index)]
+flowchart TB
+    subgraph Website["Website delivery"]
+        Customer["Customer browser"] --> CloudFront["Amazon CloudFront"]
+        CloudFront --> S3["Amazon S3<br/>Static website"]
+    end
+
+    subgraph Orders["Authenticated order flow"]
+        Cognito["Amazon Cognito<br/>JWT"] --> API["Amazon API Gateway"]
+        Customer --> API
+        API --> Lambda["AWS Lambda<br/>Create and list orders"]
+        Lambda <--> DB[("Amazon DynamoDB<br/>Orders and email index")]
+    end
 ```
 
 ## What was built
