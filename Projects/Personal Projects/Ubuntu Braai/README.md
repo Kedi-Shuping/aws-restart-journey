@@ -1,6 +1,4 @@
-
 # Ubuntu Braai & Lounge
-
 
 *A full-stack restaurant website built to demonstrate AWS serverless architecture and end-to-end cloud service integration.*
 
@@ -27,6 +25,7 @@ The reservation form on the homepage has client-side validation and a confirmati
 ## AWS Services and Tools Used
 
 - **Amazon S3** — static website hosting
+- **Amazon CloudFront** — HTTPS delivery for the static site
 - **Amazon Cognito** — user authentication and JWT issuance
 - **AWS Lambda** — three Node.js functions: automatic user confirmation, order creation, and order retrieval
 - **Amazon API Gateway** — REST endpoints protected by a Cognito authorizer
@@ -41,10 +40,9 @@ My browser requests with the `Authorization` header were failing with `TypeError
 
 I spent about two days ruling things out — cache, localhost, mixed HTTP/HTTPS, browser differences, duplicate headers, preflight status, API Gateway configuration, the Cognito authorizer. Each time I tested, each time the tests came back clean. There was even a moment where a request seemed to succeed, which turned out to be a session that had expired and fallen back to the unauthenticated path. That false positive cost me about an hour of backtracking.
 
-The cause was the last thing I checked: the Lambda source. API Gateway's Lambda proxy integration does not add CORS headers to the response. The Lambda has to return them explicitly on every return path, and mine weren't. The success return, the validation failure, and the error path all came back without them. Six returns across two functions, none with a `headers` block.
+The cause was the last thing I checked: the Lambda source. API Gateway's Lambda proxy integration does not add CORS headers to the response. The Lambda has to return them explicitly on every return path, and mine weren't. The success return, the validation failure, and the error path all came back without them.
 
 The fix was a shared `CORS_HEADERS` constant added to every return in both Lambdas.
-
 
 What I'd do differently: when the browser says `Failed to fetch` and every server-side test returns 200, the file I haven't read yet is more likely to be the problem than the configuration I've already re-checked three times. `curl` doesn't enforce CORS, so a successful response from `curl` only tells me the server processed the request — it doesn't tell me the browser can read the response.
 
@@ -54,12 +52,11 @@ Orders were going through. The create-order Lambda returned success. But nothing
 
 I checked the frontend, then the query logic in list-orders, then the GSI configuration. All three were correct, and I redeployed the Lambda more than once chasing a code bug that wasn't there.
 
-The cause was in the table itself. The partition key had been created as `rderNumber` — the leading `o` was missing. From the Console it looked right. The Lambda was writing `orderNumber`. DynamoDB didn't reject the write; the declared key and the written attribute just didn't match, so the GSI query returned nothing.
+The cause was in the table itself. The partition key had been created as `rderNumber` — the leading `o` was missing. From the Console it looked right. The Lambda was generating and writing `orderNumber`. DynamoDB expected `rderNumber`, so the write failed with a `ValidationException`. The Lambda log made the problem explicit: `Missing the key rderNumber in the item`.
 
 I found it by opening a single item in the Console and reading the key names character by character. I deleted the table, recreated it with `orderNumber` as the partition key, recreated the GSI, and everything started flowing.
 
 What I'd do differently: the Console's create-table form doesn't validate against the code. A one-character typo in a key name behaves exactly like a code bug. Compare the table's key names against the `PutCommand` and `QueryCommand` strings in the Lambda the same way I'd compare a URL.
-
 
 ### CloudFront returned 504 timeouts fetching from the S3 website endpoint
 
@@ -84,4 +81,4 @@ What I'd do differently: when using the S3 website endpoint as a CloudFront orig
 - Order submission writes to DynamoDB and returns a server-generated order number.
 - The dashboard retrieves and displays orders by email, and a new order appears immediately.
 
-  ![Dashboard with order history](Screenshots/02-dashboard-orders.png)
+![Dashboard with order history](Screenshots/02-dashboard-orders.png)
