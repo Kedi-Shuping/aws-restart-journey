@@ -125,7 +125,7 @@ Regulation tools: breathing guide, glitter jar, ambient nature sounds, and a rec
 
 ## Live
 
-Live at: https://d1m0wbmrmfzbc8z.cloudfront.net
+Live at: https://d1m0wbmmfzbc8z.cloudfront.net
 
 ---
 
