@@ -54,6 +54,12 @@ I checked the frontend, then the query logic in list-orders, then the GSI config
 
 The cause was in the table itself. The partition key had been created as `rderNumber` — the leading `o` was missing. From the Console it looked right. The Lambda was generating and writing `orderNumber`. DynamoDB expected `rderNumber`, so the write failed with a `ValidationException`. The Lambda log made the problem explicit: `Missing the key rderNumber in the item`.
 
+![DynamoDB key error in the Lambda execution log](Screenshots/04-dynamodb-key-error.png)
+
+The Lambda code was generating `orderNumber` and adding it to the item being written:
+
+![Order number generation in the create-order Lambda](Screenshots/05-order-number-code.png)
+
 I found it by opening a single item in the Console and reading the key names character by character. I deleted the table, recreated it with `orderNumber` as the partition key, recreated the GSI, and everything started flowing.
 
 What I'd do differently: the Console's create-table form doesn't validate against the code. A one-character typo in a key name behaves exactly like a code bug. Compare the table's key names against the `PutCommand` and `QueryCommand` strings in the Lambda the same way I'd compare a URL.
@@ -61,6 +67,8 @@ What I'd do differently: the Console's create-table form doesn't validate agains
 ### CloudFront returned 504 timeouts fetching from the S3 website endpoint
 
 After moving the site behind CloudFront for HTTPS, every request through the CloudFront URL returned `504 Gateway Timeout`. The S3 website endpoint itself was still working — a direct request to `http://ubuntu-braai.s3-website.eu-north-1.amazonaws.com/` returned the homepage normally.
+
+![CloudFront 504 Gateway Timeout](Screenshots/03-cloudfront-504.png)
 
 The cause was the origin protocol. CloudFront's Console had defaulted the origin to **HTTPS only**, but the S3 *website* endpoint only serves HTTP. CloudFront was trying to connect over HTTPS, getting no response, and timing out after 30 seconds.
 
