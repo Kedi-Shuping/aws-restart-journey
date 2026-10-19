@@ -45,7 +45,6 @@ The cause was the last thing I checked: the Lambda source. API Gateway's Lambda 
 
 The fix was a shared `CORS_HEADERS` constant added to every return in both Lambdas.
 
-Four lines. Two Lambdas. Two days.
 
 What I'd do differently: when the browser says `Failed to fetch` and every server-side test returns 200, the file I haven't read yet is more likely to be the problem than the configuration I've already re-checked three times. `curl` doesn't enforce CORS, so a successful response from `curl` only tells me the server processed the request — it doesn't tell me the browser can read the response.
 
