@@ -43,7 +43,3 @@ This document covers the cloud architecture for a 3D e-commerce web application.
 **Public vs. Private Origin:** Keeping the ALB private behind CloudFront shields the backend from unwanted, direct internet exposure but requires more VPC work such as NAT gateways, routing rules, and connectivity configuration.
 
 **Scaling Dependencies:** A sudden spike due a popular product launch triggers rapid Auto Scaling which can create connection pressure on downstream components like RDS. System-wide monitoring is needed to catch this before it becomes a problem.
-
----
-
-*Transcribed from the group's final draft. The original architecture diagram will be added separately once we prepare a legible version.*
