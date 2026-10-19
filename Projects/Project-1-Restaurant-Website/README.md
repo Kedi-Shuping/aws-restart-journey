@@ -32,15 +32,12 @@ The email attached to an order is read from the Cognito token rather than sent b
 
 ```mermaid
 flowchart LR
-    A[Customer browser] --> B[Amazon CloudFront]
-    B --> C[Amazon S3<br/>Static website]
-    A --> D[Amazon API Gateway]
-    E[Amazon Cognito] -->|JWT| D
-    D --> F[AWS Lambda<br/>Create / list orders]
-    F --> G[(Amazon DynamoDB<br/>Orders + email-index)]
-    G --> F
-    F --> D
-    D --> A
+    C[Customer] --> CF[CloudFront]
+    CF --> S3[S3 website]
+    C --> API[API Gateway]
+    Auth[Cognito JWT] --> API
+    API --> L[Lambda]
+    L <--> DB[(DynamoDB<br/>Orders + email index)]
 ```
 
 ## What was built
