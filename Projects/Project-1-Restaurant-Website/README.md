@@ -57,19 +57,6 @@ flowchart LR
 
 The application includes a homepage, menu, cart and checkout, order confirmation, a signed-in dashboard with order history, and a client-side reservation form. An admin dashboard (`admin.html`) was also built to manage order status, but it currently uses local storage and a client-side password check; it is not integrated with the deployed Cognito/API architecture.
 
-## How this meets the brief
-
-| Requirement | Status |
-|---|---|
-| Static website hosted on AWS | **Delivered** — S3 with CloudFront |
-| Cognito sign-in for customers | **Delivered** — email sign-in, session persistence, logout |
-| Backend and database for customer data and orders | **Delivered** — API Gateway, Lambda, DynamoDB |
-| Order submission and confirmation | **Delivered** — server-generated order number shown to the customer |
-| Booking form | **Partially delivered** — form validates input, but does not persist reservations to a backend |
-| PowerPoint presentation | README documents the project substance; slide deck remains the next artifact |
-
-The booking form is the one brief requirement not yet fully backend-integrated. The existing order flow provides a pattern for extending the application: reservations could be connected to a new Lambda function and a separate DynamoDB table.
-
 ## Verification
 
 - The site loads over HTTPS through CloudFront.
