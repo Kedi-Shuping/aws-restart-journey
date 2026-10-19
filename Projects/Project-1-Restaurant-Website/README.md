@@ -1,81 +1,74 @@
 # Project 1 – Restaurant Static Website on AWS
 
-*A static restaurant website hosted on AWS, with Cognito authentication, a serverless order backend, and a documented migration path for a small business moving off manual systems.*
+*A restaurant website built for the AWS re/Start Project 1 brief — with a working customer order journey, Cognito authentication, a serverless backend, and a practical migration path for a small business.*
 
-## Overview
+## Ubuntu Braai & Lounge
 
-Ubuntu Braai & Lounge is a restaurant website hosted on Amazon S3 and served over HTTPS through CloudFront. Customers sign in with Amazon Cognito, browse the menu, place orders, and view their order history on a dashboard.
+Ubuntu Braai & Lounge is a restaurant website hosted on Amazon S3 and served over HTTPS through CloudFront. Customers can browse the restaurant experience, sign in, place orders, and return to a dashboard to view their order history.
 
-The order flow runs end to end: the browser sends an authenticated request to API Gateway, the Cognito authorizer validates the JWT, a Lambda function writes the order to DynamoDB, and the dashboard retrieves it by email using a Global Secondary Index. The email on each order is read from the Cognito token rather than sent by the browser, so identity is asserted by the issuer, not by the client.
+**[Visit the live website](https://d10m2glnu4j9zd.cloudfront.net/)**
 
-This project was built against the Praesignis AWS re/Start Project 1 brief: a static restaurant website with Cognito sign-in, a database backend for bookings and orders, and a recommended migration path for a small business.
+![Ubuntu Braai & Lounge homepage served over HTTPS through CloudFront](Screenshots/01-homepage.png)
 
-**Live website:** [Ubuntu Braai & Lounge](https://d10m2glnu4j9zd.cloudfront.net/)
+The website brings together the customer-facing experience and the AWS services behind it. The homepage includes a reservation form; the menu leads into a cart and checkout flow; and successful orders receive a server-generated order number.
 
-![Homepage served over HTTPS through CloudFront](Screenshots/01-homepage.png)
+### The customer journey
 
+- **Discover:** the homepage introduces Ubuntu Braai & Lounge.
+- **Browse:** customers explore the menu and select items.
+- **Order:** the cart and checkout flow submit an order to the backend.
+- **Confirm:** the customer receives an order confirmation with a generated order number.
+- **Return:** signed-in customers can view their order history on the dashboard.
 
-## What Was Built
-
-- **Amazon S3** – static website hosting
-- **Amazon CloudFront** – HTTPS termination and content delivery
-- **Amazon Cognito** – customer sign-up and sign-in, email-based, no MFA
-- **AWS Lambda** – three Node.js functions: user auto-confirmation, order creation, order retrieval
-- **Amazon API Gateway** – REST API with a Cognito authorizer on `/orders`
-- **Amazon DynamoDB** – `ubuntu-orders` table, partition key `orderNumber`, GSI `email-index`
-- **AWS Budgets** – $0.01 cost tripwire
-
-The site includes a homepage, menu, order flow with cart and checkout, order confirmation, a signed-in dashboard showing order history, and a client-side reservation form.
-
-## How This Meets the Brief
-
-| Requirement | Status |
-|---|---|
-| Static website hosted on AWS | Delivered — S3 with CloudFront |
-| Cognito sign-in for customers | Delivered — email sign-in, session persistence, logout |
-| Backend + database for customer data and orders | Delivered — API Gateway, Lambda, DynamoDB |
-| Order submission form and confirmation | Delivered — server-generated order number shown on confirmation |
-| Booking form | Partially delivered — form is built and validates input; it does not yet persist to a backend |
-| PowerPoint presentation | Content documented in this README; slide deck is the next artifact |
-
-The booking form is the one requirement that is not fully backend-integrated. The order flow follows the same pattern the booking flow would use, so wiring reservations to a new Lambda and DynamoDB table is a straightforward extension of the deployed architecture rather than new work.
+The reservation form is currently front-end only: it validates the input and displays a confirmation, but does not yet save reservations to a backend.
 
 ![Booking form with client-side validation](Screenshots/02-booking-form.png)
 
-## Recommended Architecture for a Production Deployment
+## How the AWS pieces work together
 
-The deployed stack is the minimum that meets the brief. For a real restaurant moving to AWS at scale, the following services would extend it without changing the shape of the solution:
+The order flow runs end to end. The browser sends an authenticated request to API Gateway, the Cognito authorizer validates the JWT, a Lambda function writes the order to DynamoDB, and the dashboard retrieves orders by email using a Global Secondary Index.
 
-- **Amazon Route 53** – custom domain and DNS
-- **Amazon SES** – order and reservation confirmation emails
-- **Amazon SQS** – queueing order writes during peak periods so Lambda invocations are buffered
-- **A second DynamoDB table for reservations** – mirrors the orders table, keyed on reservation number
-- **Amazon Cognito user groups** – separating staff and customer roles for a proper admin interface
-- **Amazon CloudWatch** – application monitoring and log retention
-- **AWS IAM roles scoped per function** – least-privilege access for each Lambda
+The email attached to an order is read from the Cognito token rather than sent by the browser. The backend therefore uses the identity asserted by the token issuer instead of trusting a client-supplied email address.
 
-These services represent what a growing restaurant would eventually need. The deployed stack represents what a small restaurant actually needs today. The difference is not capability — it is scale. The current architecture can be extended into the recommended one without rebuilding anything.
+```mermaid
+flowchart LR
+    A[Customer browser] --> B[Amazon CloudFront]
+    B --> C[Amazon S3<br/>Static website]
+    A --> D[Amazon API Gateway]
+    E[Amazon Cognito] -->|JWT| D
+    D --> F[AWS Lambda<br/>Create / list orders]
+    F --> G[(Amazon DynamoDB<br/>Orders + email-index)]
+    G --> F
+    F --> D
+    D --> A
+```
 
-An admin dashboard (`admin.html`) was built alongside the customer-facing site to manage order status. It currently reads from local storage and uses a client-side password check, and it is not wired into the current Cognito and API architecture. Rebuilding it against the deployed stack is a recommended next step.
+## What was built
 
-## Cost Analysis
+| AWS service | Role in the project |
+|---|---|
+| **Amazon S3** | Hosts the static website |
+| **Amazon CloudFront** | Serves the site over HTTPS |
+| **Amazon Cognito** | Customer sign-up and sign-in, with session persistence |
+| **Amazon API Gateway** | REST API with a Cognito authorizer on `/orders` |
+| **AWS Lambda** | Three Node.js functions: user auto-confirmation, order creation, and order retrieval |
+| **Amazon DynamoDB** | `ubuntu-orders` table, partition key `orderNumber`, and GSI `email-index` |
+| **AWS Budgets** | $0.01 cost tripwire |
 
-The deployed stack runs within AWS's free tiers at the traffic levels this site sees.
+The application includes a homepage, menu, cart and checkout, order confirmation, a signed-in dashboard with order history, and a client-side reservation form. An admin dashboard (`admin.html`) was also built to manage order status, but it currently uses local storage and a client-side password check; it is not integrated with the deployed Cognito/API architecture.
 
-| Service | Free allowance | Current cost |
-|---|---|---|
-| AWS Lambda | 1M requests, 400K GB-s per month | $0.00 |
-| Amazon DynamoDB | 25 GB storage, 25 RCU/WCU | $0.00 |
-| Amazon Cognito | 50,000 monthly active users | $0.00 |
-| Amazon S3 | 5 GB storage, 20K GETs, 2K PUTs per month | $0.00 |
-| Amazon API Gateway | 1M REST API calls per month | $0.00 |
-| Amazon CloudFront | 1 TB data out, 10M requests per month | $0.00 |
+## How this meets the brief
 
-DynamoDB on-demand pricing and Lambda per-request billing scale with actual usage rather than provisioned capacity, so a restaurant pays for orders that actually happened rather than for servers standing by. At current traffic levels, total spend to date is $0.00.
+| Requirement | Status |
+|---|---|
+| Static website hosted on AWS | **Delivered** — S3 with CloudFront |
+| Cognito sign-in for customers | **Delivered** — email sign-in, session persistence, logout |
+| Backend and database for customer data and orders | **Delivered** — API Gateway, Lambda, DynamoDB |
+| Order submission and confirmation | **Delivered** — server-generated order number shown to the customer |
+| Booking form | **Partially delivered** — form validates input, but does not persist reservations to a backend |
+| PowerPoint presentation | README documents the project substance; slide deck remains the next artifact |
 
-**Cost controls:** an AWS Budgets tripwire is configured at $0.01 to alert on any spend. If the account starts accruing charges — through traffic growth, a misconfigured service, or a forgotten resource — the alert fires before the cost becomes meaningful.
-
-The comparison to the restaurant's current manual system is straightforward. Paper-based booking and order tracking has no direct AWS cost, but it has a staffing cost — hours spent reconciling bookings, correcting order mix-ups, and confirming reservations by phone. The cloud version reduces that labour, and the infrastructure cost is lower than one hour of staff time per month.
+The booking form is the one brief requirement not yet fully backend-integrated. The existing order flow provides a pattern for extending the application: reservations could be connected to a new Lambda function and a separate DynamoDB table.
 
 ## Verification
 
@@ -84,13 +77,43 @@ The comparison to the restaurant's current manual system is straightforward. Pap
 - Order submission writes to DynamoDB and returns a server-generated order number.
 - The dashboard retrieves and displays orders by email, and a new order appears immediately.
 
-![Order confirmation with server-generated order number](Screenshots/03-order-confirmation.png)
+![Order confirmation showing a server-generated order number](Screenshots/03-order-confirmation.png)
+
+## Cost analysis
+
+The deployed stack has been running within the applicable AWS free-tier allowances at the traffic levels observed during development. Actual eligibility and charges depend on account terms, usage, and current AWS pricing.
+
+| Service | Allowance referenced during project work | Recorded cost |
+|---|---|---|
+| AWS Lambda | 1M requests and 400K GB-seconds per month | $0.00 |
+| Amazon DynamoDB | 25 GB storage, 25 RCU/WCU | $0.00 |
+| Amazon Cognito | 50,000 monthly active users | $0.00 |
+| Amazon S3 | 5 GB storage, 20K GETs, 2K PUTs per month | $0.00 |
+| Amazon API Gateway | 1M REST API calls per month | $0.00 |
+| Amazon CloudFront | 1 TB data out, 10M requests per month | $0.00 |
+
+DynamoDB on-demand pricing and Lambda per-request billing scale with usage rather than requiring application servers to remain running. At the time of this project check, total spend to date was $0.00.
+
+**Cost control:** an AWS Budgets alert is configured at $0.01 to flag unexpected spend early, including charges caused by increased traffic or forgotten resources.
+
+The comparison with a manual restaurant workflow is not simply “cloud is free.” Paper-based order and booking management has labour costs too: reconciling orders, correcting mix-ups, and confirming reservations. The deployed architecture demonstrates a route to reducing that administrative work, while keeping the infrastructure small and extendable.
+
+## Recommended production extensions
+
+The deployed stack meets most of the brief at the scale of a small demonstration. A production restaurant could extend it with:
+
+- **Amazon Route 53** — custom domain and DNS
+- **Amazon SES** — order and reservation confirmation emails
+- **Amazon SQS** — buffer asynchronous work during demand spikes, where the workload warrants it
+- **A reservations table in DynamoDB** — persist booking requests separately from orders
+- **Amazon Cognito user groups** — separate staff and customer permissions
+- **Amazon CloudWatch** — application monitoring and log retention
+- **Scoped AWS IAM roles** — least-privilege access for each Lambda function
+
+These are proposed extensions, not services currently deployed for this project. The intent is to extend the existing design where the business needs it, rather than add services simply for the sake of a larger architecture.
 
 ## Presentation
 
-The brief calls for a PowerPoint presentation covering the restaurant's overview, challenges, AWS services, cost analysis, and migration benefits. The content for that presentation is documented in this README — the Overview, Recommended Architecture, Cost Analysis, and Verification sections together form the presentation's substance. A slide deck is the next artifact.
+The brief calls for a PowerPoint presentation covering the restaurant overview, challenges, AWS services, cost analysis, and migration benefits. This README provides the supporting project narrative and evidence; the slide deck is the next artifact.
 
-## Live
-
-[https://d10m2glnu4j9zd.cloudfront.net/](https://d10m2glnu4j9zd.cloudfront.net/)
-
+**[Explore Ubuntu Braai & Lounge live](https://d10m2glnu4j9zd.cloudfront.net/)**
