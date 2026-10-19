@@ -114,6 +114,6 @@ These are proposed extensions, not services currently deployed for this project.
 
 ## Presentation
 
-The brief calls for a PowerPoint presentation covering the restaurant overview, challenges, AWS services, cost analysis, and migration benefits. This README provides the supporting project narrative and evidence; the slide deck is the next artifact.
+The brief calls for a PowerPoint presentation covering the restaurant overview, challenges, AWS services, cost analysis, and migration benefits. This README covers those topics; the slide deck is the next artifact.
 
 **[Explore Ubuntu Braai & Lounge live](https://d10m2glnu4j9zd.cloudfront.net/)**
