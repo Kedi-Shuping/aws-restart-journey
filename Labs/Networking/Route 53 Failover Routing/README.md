@@ -50,47 +50,31 @@ This was **Availability Zone failover within one Region**, not a deployment acro
 
 ## Project Workflow
 
-1. Worked with the café website hosted on the primary EC2 instance in `us-west-2a`.
-2. Identified the secondary café website hosted in `us-west-2b`.
-3. Created a Route 53 hosted zone and configured failover routing records for the café website.
-4. Created the `Primary-Website-Health` health check for the primary endpoint.
-5. Configured the SNS topic used for health-related notifications.
-6. Confirmed the SNS email subscription through the confirmation link sent by AWS Notifications.
-7. Tested the primary endpoint and observed its health-check status.
-8. Observed the health check change from **Healthy** to **Unhealthy**.
-9. Refreshed the café website and observed it loading from the secondary endpoint in the other Availability Zone.
+I started with the café website hosted on the primary EC2 instance in `us-west-2a`, then identified the secondary website in `us-west-2b`.
+
+The primary website was accessible at `44.238.1.18`.
+
+![Primary café website](screenshots/01-primary-cafe-website.png)
+
+I then created a Route 53 hosted zone, configured the failover routing records, and created the `Primary-Website-Health` health check for the primary endpoint. I also configured the SNS topic used for health-related notifications and confirmed its email subscription through the link sent by AWS Notifications.
+
+## Health Checks and Notifications
+
+The health check was named `Primary-Website-Health`. During testing, its status changed from **Healthy** to **Unhealthy**.
+
+![Primary health check status](screenshots/02-primary-health-check-unhealthy.png)
+
+The lab instructions specified the `/cafe` request path for the health check, but the captured creation form does not show the path value. I therefore cannot verify the final saved path from the available screenshot.
+
+The captured secondary-record form also appears to show the primary health-check ID selected. The lab instructions say to leave the secondary record's health-check association blank. There is no screenshot of the final saved record, so I have not treated that setting as confirmed.
+
+The SNS email subscription confirmation for `Primary-Website-Health` was received on **19 August 2026 at 4:38 PM**, and I confirmed the subscription using the link in the email. The separate alarm notification expected by the lab was not recovered from the inbox, so I have not used it as evidence of successful alarm-email delivery.
 
 ## Failover Demonstration
 
 The primary café website was initially served from `44.238.1.18` in `us-west-2a`. When the primary health check changed to **Unhealthy**, Route 53 failed over to the secondary website at `52.41.137.204` in `us-west-2b`.
 
 I was able to access the café website through the secondary instance after the primary health check failed. This was the result I was looking for: traffic was directed away from the unhealthy primary endpoint and the secondary endpoint took over.
-
-## Health Checks and Notifications
-
-The health check was named `Primary-Website-Health`. The lab instructions specified the `/cafe` request path for the health check, but the captured creation form does not show the path value. I therefore cannot verify the final saved path from the available screenshot.
-
-The captured secondary-record form also appears to show the primary health-check ID selected. The lab instructions say to leave the secondary record's health-check association blank. There is no screenshot of the final saved record, so I have not treated that setting as confirmed.
-
-The SNS email subscription confirmation for `Primary-Website-Health` was received on **19 August 2026 at 4:38 PM**, and I confirmed the subscription using the link in the email. The separate alarm notification expected by the lab was not recovered from the inbox, so I have not used it as evidence of successful alarm-email delivery.
-
-## Screenshots
-
-### Primary Café Website
-
-The café page was accessible from the primary endpoint, `44.238.1.18`, in `us-west-2a`.
-
-![Primary café website](screenshots/01-primary-cafe-website.png)
-
-### Primary Health Check
-
-The health-check evidence shows the primary endpoint changing from **Healthy** to **Unhealthy**.
-
-![Primary health check status](screenshots/02-primary-health-check-unhealthy.png)
-
-### Secondary Café Website
-
-After the primary endpoint became unhealthy, the café page loaded from the secondary endpoint, `52.41.137.204`, in `us-west-2b`.
 
 ![Secondary café website](screenshots/03-secondary-cafe-website.png)
 
