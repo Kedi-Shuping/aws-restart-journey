@@ -2,84 +2,115 @@
 
 ## Overview
 
-This lab brought together Amazon EC2, an Application Load Balancer, EC2 Auto Scaling, and CloudWatch. I started with an existing web server, created an AMI from it, and used that image as the basis for instances managed by an Auto Scaling group.
+In this lab, I built a highly available, automatically scaling web application architecture using Amazon EC2, an Application Load Balancer, an EC2 Auto Scaling group, and Amazon CloudWatch.
 
-The finished setup distributed application traffic through a load balancer and ran instances across two Availability Zones. I then generated CPU load and watched the Auto Scaling group respond.
+I began with an existing web server and created an Amazon Machine Image (AMI) from it. I then used that image in an EC2 launch template so that the Auto Scaling group could launch matching application instances when additional capacity was needed.
 
-## What I Built
+The completed architecture distributed incoming requests across healthy instances in two Availability Zones. I generated CPU load to observe the monitoring and scaling response.
+
+## Architecture and Service Roles
+
+Each service had a distinct responsibility:
+
+- **Application Load Balancer (ALB):** provided a single application entry point and distributed incoming HTTP requests.
+- **Target group:** registered the application instances and reported their health to the load balancer.
+- **EC2 launch template:** defined how new application instances should be created, including the AMI, instance type, and security group.
+- **EC2 Auto Scaling group:** maintained the required number of instances across two Availability Zones and adjusted capacity when demand changed.
+- **Amazon CloudWatch:** supplied the CPU utilisation monitoring used by the target-tracking scaling policy.
+
+The load balancer distributed traffic; it did not create or manage the instances. The Auto Scaling group managed the EC2 capacity, while the launch template supplied the configuration for instances it launched.
+
+## Configuration
+
+I configured the architecture with the following settings:
 
 - Created an AMI from the original web server.
-- Configured an Application Load Balancer and target group.
-- Created a launch template using the web server AMI and its security group.
-- Configured an Auto Scaling group across two Availability Zones.
-- Set the group's minimum and desired capacity to 2, with a maximum of 4.
-- Configured target tracking for average CPU utilization with a 50% target.
-- Sent load to the application and observed the scaling response.
+- Created the launch template `web-app-launch-template` using that AMI, a `t3.micro` instance type, and the required security group.
+- Configured an Application Load Balancer listening on HTTP port 80 and forwarding requests to the application target group.
+- Created an Auto Scaling group spanning two Availability Zones.
+- Set minimum capacity to **2**, desired capacity to **2**, and maximum capacity to **4**.
+- Added a target-tracking scaling policy targeting average CPU utilisation of **50%**.
 
-## How the Pieces Worked Together
+The load balancer operated in public subnets, while the Auto Scaling instances were placed in private subnets across the two Availability Zones.
 
-The Application Load Balancer provided a single entry point and forwarded requests to healthy instances registered with its target group. The Auto Scaling group managed the number of EC2 instances available to handle that traffic.
+## How Scaling Worked
 
-When I generated CPU load, CloudWatch reported the high-CPU condition and the target-tracking policy responded by adding capacity. The activity history recorded the desired capacity increasing from 2 to 4.
+With two application instances running, I generated CPU load against the web application.
 
-This made the difference between the services clear: the load balancer distributes requests, while Auto Scaling adjusts the amount of compute capacity available to serve them.
+CloudWatch recorded the increase in CPU utilisation. When the scaling condition was met, the target-tracking policy initiated a scale-out. The Auto Scaling Activity History showed the desired capacity increasing from **2 to 4**, followed by the launch of additional EC2 instances.
 
-## Architecture
+This demonstrated the relationship between the services: the ALB distributes requests across healthy targets, while the Auto Scaling group changes the amount of compute capacity available to handle those requests.
+
+## Architecture Diagram
 
 ```text
-                         Users
-                           |
-                           v
-                 Application Load Balancer
-                           |
-                           v
-                      Target Group
-                      /          \
-                     v            v
-               EC2 Instance  EC2 Instance
-                     \            /
-                      \          /
-                    Auto Scaling Group
-                           |
-                           v
-                 CloudWatch metrics
-                  and scaling signals
+                         Incoming requests
+                                |
+                                v
+                    Application Load Balancer
+                                |
+                                v
+                           Target Group
+                                |
+             +------------------+------------------+
+             |          EC2 Auto Scaling Group     |
+             |                                     |
+             |       EC2 instance   EC2 instance   |
+             |       (AZ 1)         (AZ 2)         |
+             +------------------^------------------+
+                                |
+                      Desired capacity adjusts
+                                |
+                    Target-tracking policy
+                                ^
+                                |
+                       CloudWatch metrics
+                         (CPU utilisation)
 ```
 
-The load balancer operated in public subnets, while the Auto Scaling instances were placed in private subnets across two Availability Zones.
+The Auto Scaling group owns and manages the EC2 instances. The target group registers those instances as load-balancer targets and checks their health. CloudWatch metrics inform the target-tracking policy when capacity needs to change.
 
-## Verification
+## Evidence and Verification
 
-I verified that:
+The screenshots below show the key configuration and the outcome of the test. They are selected evidence of the working architecture rather than a record of every console action.
 
-- The AMI was created successfully and used as the source image for the launch template.
-- The load balancer's target group had two healthy application instances across two Availability Zones.
-- The load-test page generated CPU load.
-- The high-CPU CloudWatch alarm entered the **In alarm** state.
-- Auto Scaling Activity History recorded the desired capacity changing from **2 to 4** and the launch of additional EC2 instances.
+### 1. EC2 launch template
 
-## Screenshots
+The launch template uses the AMI created from the original web server and specifies the `t3.micro` instance type. This provides the reusable instance configuration for the Auto Scaling group.
 
-The selected screenshots focus on the configuration and the result, rather than documenting every console step.
+![EC2 launch template showing the AMI and t3.micro instance type](screenshots/01-ec2-launch-template.png)
 
-| Screenshot | What it shows |
-|---|---|
-| [Launch template](screenshots/01-ec2-launch-template.png) | The reusable EC2 instance configuration and AMI selection |
-| [Healthy load-balancer targets](screenshots/02-load-balancer-healthy-targets.png) | Two healthy targets across Availability Zones |
-| [High-CPU alarm](screenshots/03-cloudwatch-high-cpu-alarm.png) | CloudWatch detecting CPU utilization above the 50% threshold |
-| [Auto Scaling scale-out](screenshots/04-auto-scaling-scale-out.png) | Activity History recording capacity increasing from 2 to 4 |
+### 2. Healthy load-balancer targets
+
+The target group shows two registered application targets in separate Availability Zones, both reporting **Healthy**. This confirms that the load balancer had healthy instances available to receive traffic.
+
+![Two healthy load-balancer targets across two Availability Zones](screenshots/02-load-balancer-healthy-targets.png)
+
+### 3. CloudWatch high-CPU alarm
+
+The `AlarmHigh` CloudWatch alarm entered the **In alarm** state when CPU utilisation exceeded the configured **50%** threshold during the load test.
+
+![CloudWatch AlarmHigh in alarm after CPU utilisation exceeded 50 percent](screenshots/03-cloudwatch-high-cpu-alarm.png)
+
+### 4. Auto Scaling scale-out
+
+The Auto Scaling Activity History records the desired capacity increasing from **2 to 4** in response to the scaling activity. This is the key evidence that the architecture responded to increased load by adding compute capacity.
+
+![Auto Scaling Activity History showing desired capacity increasing from two to four](screenshots/04-auto-scaling-scale-out.png)
 
 ## Skills Demonstrated
 
-- Amazon EC2 and Amazon Machine Images
-- Application Load Balancer and target groups
-- EC2 launch templates and Auto Scaling groups
-- Multi-AZ deployment
-- Public and private subnet placement
-- CloudWatch alarms and target-tracking scaling
-- Load testing and verification
-- CLI-based AMI creation and troubleshooting
+- Creating and using an Amazon Machine Image (AMI)
+- Configuring EC2 launch templates
+- Deploying an Application Load Balancer and target group
+- Configuring an EC2 Auto Scaling group across Availability Zones
+- Applying target-tracking scaling based on CPU utilisation
+- Monitoring application infrastructure with CloudWatch
+- Generating load and verifying scale-out activity
+- Using the AWS CLI to create an AMI and troubleshoot configuration issues
 
 ## Key Takeaway
 
-The main lesson was seeing these services work together as one system. The load balancer routed requests to healthy instances, while Auto Scaling added compute capacity when demand increased. CloudWatch provided the monitoring signal that helped the architecture respond.
+This lab connected load balancing, compute capacity, and monitoring into one working architecture. The Application Load Balancer distributed requests to healthy application instances, while the Auto Scaling group adjusted the number of instances available. Under increased CPU load, the target-tracking policy increased desired capacity from two instances to four.
+
+The practical lesson was understanding not just what each service does individually, but how they work together to keep an application responsive as demand changes.
