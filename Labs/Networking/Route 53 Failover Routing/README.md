@@ -29,8 +29,8 @@ Both web servers were deployed in **US West (Oregon), `us-west-2`**, but in diff
                     Amazon Route 53
                           |
                  Failover routing records
-                    /             \
-                   /               \
+                    /             \\
+                   /               \\
              PRIMARY             SECONDARY
                 |                    |
                 v                    v
@@ -62,7 +62,11 @@ I then created a Route 53 hosted zone, configured the failover routing records, 
 
 The health check was named `Primary-Website-Health`. During testing, its status changed from **Healthy** to **Unhealthy**.
 
-![Primary health check status](screenshots/02-primary-health-check-unhealthy.png)
+The initial health-check status was **Healthy**, confirming that Route 53 could reach the primary endpoint before the failover test.
+
+![Primary health check showing Healthy status](screenshots/02-primary-health-check-healthy.png)
+
+![Primary health check showing Unhealthy status](screenshots/02-primary-health-check-unhealthy.png)
 
 The lab instructions specified the `/cafe` request path for the health check, but the captured creation form does not show the path value. I therefore cannot verify the final saved path from the available screenshot.
 
