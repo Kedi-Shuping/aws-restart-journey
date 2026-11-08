@@ -95,8 +95,8 @@ I was able to access the café website through the secondary instance after the 
 
 ## Key Lessons Learned
 
-This lab helped connect DNS routing with application availability. A secondary server is useful only when the routing configuration can direct users to it when the primary endpoint is unhealthy.
+Before this lab, failover routing was something I understood in theory. Seeing the health check change from Healthy to Unhealthy, and then accessing the café website through the secondary server, made the process much easier to understand.
 
-It was also useful to see the difference between deploying resources in separate Availability Zones and deploying across separate AWS Regions. Both can support resilience, but this exercise used two Availability Zones within `us-west-2`.
+I also got to see how Availability Zones fit into a highly available setup. Both servers were in the same AWS Region, `us-west-2`, but in different Availability Zones. That helped me understand the difference between spreading resources across Availability Zones and deploying across multiple Regions.
 
-The clearest evidence was the change from the primary café website to the secondary one after the health check reported an unhealthy endpoint.
+What made the exercise click for me was seeing the change happen: the primary endpoint became unhealthy, and the secondary endpoint served the website instead.
