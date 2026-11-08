@@ -26,11 +26,15 @@ To make the log data easier to investigate, I used Athena with an external table
 
 This allowed me to query the recorded API activity instead of manually opening individual CloudTrail log files.
 
+![CloudTrail trail creation and S3 destination](screenshots/01-cloudtrail-trail-created.png)
+
 ## Reconstructing the Incident
 
 The Athena results showed a sequence of EC2 API calls associated with the investigation:
 
-| Time (UTC) | Event | Source IP | Identity / context |
+![CloudTrail website modification record](screenshots/02-cloudtrail-website-modified.png)
+
+| Time (UTC+02:00) | Event | Source IP | Identity / context |
 | --- | --- | --- | --- |
 | 20:01:50 | `DescribeSecurityGroups` | `34.221.70.64` | Hacker Instance |
 | 20:02:00 | `DescribeInstances` | `34.215.21.41` | AWS CLI / Linux |
@@ -40,11 +44,21 @@ The key event was `AuthorizeSecurityGroupIngress`. The CloudTrail event record i
 
 The event modified security group `sg-0dabd80cf7192bee6` by adding an inbound rule that allowed SSH traffic over TCP port 22 from `0.0.0.0/0`. The new security group rule ID was `sgr-02b68ecca0fe6eb8e`.
 
+![CloudTrail security group modification record](screenshots/03-cloudtrail-security-group-modified.png)
+
+![CloudTrail security group authorization event](screenshots/04-cloudtrail-security-group-authorization.png)
+
 This was the central finding of the investigation: the IAM user `chaos` made an unauthorised change that exposed SSH access to the internet.
+
+![CloudTrail activity timeline for IAM user chaos](screenshots/07-cloudtrail-chaos-activity-timeline.png)
 
 ## What the CloudTrail Records Revealed
 
 The event details showed more than the name of the API call. I could inspect the identity that made the request, the source IP address, the event time, the AWS Region, the user agent, and the request parameters.
+
+![CloudTrail API call details](screenshots/05-cloudtrail-api-call-details.png)
+
+![CloudTrail API request parameters](screenshots/06-cloudtrail-api-request.png)
 
 The user agent identified AWS CLI activity on Linux. The event also showed that the request changed the security group configuration (`readOnly: false`).
 
