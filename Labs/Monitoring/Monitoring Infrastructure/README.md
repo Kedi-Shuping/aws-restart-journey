@@ -2,16 +2,16 @@
 
 ## Overview
 
-In this lab, I configured monitoring for an Apache web server running on an Amazon EC2 instance. The work covered system monitoring, application log collection, custom metrics, alarms and notifications, instance state-change notifications, and AWS Config rules.
+In this lab, I set up monitoring for an Apache web server running on an EC2 instance. I worked with the CloudWatch Agent, CloudWatch Logs, metric filters and alarms, SNS notifications, EventBridge, and AWS Config.
 
-I worked through the monitoring setup by connecting the different AWS services and then testing the notifications and metrics to confirm that they were working as expected.
+The lab brought together several ways of keeping track of an environment: looking inside the instance for application and system information, reacting to errors in the web server logs, receiving notifications when an alarm or EC2 state change occurred, and checking resource configuration with AWS Config.
 
 ## AWS Services and Tools Used
 
 - Amazon EC2
-- AWS Systems Manager
+- AWS Systems Manager Run Command
 - AWS Systems Manager Parameter Store
-- Amazon CloudWatch
+- Amazon CloudWatch (Agent, Logs, Metrics, Alarms and metric filters)
 - Amazon SNS
 - Amazon EventBridge
 - AWS Config
@@ -19,101 +19,55 @@ I worked through the monitoring setup by connecting the different AWS services a
 
 ## Project Workflow
 
-1. Installed the Amazon CloudWatch Agent on the EC2 web server using Systems Manager Run Command.
-2. Stored the CloudWatch Agent configuration in Systems Manager Parameter Store and configured the agent to collect Apache logs and system metrics.
-3. Generated a 404 response from the web server and used CloudWatch Logs to confirm that the request was recorded.
-4. Created a CloudWatch metric filter and alarm to count 404 errors and send an SNS notification when the threshold was reached.
-5. Inspected CloudWatch Agent metrics for disk usage and memory usage to see information from inside the EC2 operating system.
-6. Created an EventBridge rule to detect EC2 instances entering the `stopped` or `terminated` state and send an SNS notification.
-7. Configured AWS Config rules to check EC2-related resources for required tags and volume usage.
+### CloudWatch Agent and Parameter Store
 
-## Technical Context
+I used Systems Manager Run Command to prepare the CloudWatch Agent on the EC2 instance. I stored the agent configuration in Parameter Store under the name `Monitor-Web-Server`, then ran the configuration command so the agent could retrieve the parameter and start.
 
-The main monitoring points were:
+![CloudWatch Agent configured from Parameter Store](screenshots/02-cloudwatch-agent-parameter-configuration.png)
 
-- **CloudWatch Agent:** The agent collected Apache access and error logs as well as CPU, disk, memory, and swap metrics from inside the EC2 instance.
-- **CloudWatch Logs and Metrics:** Logs were used to investigate web requests, while a metric filter converted matching 404 log entries into a numeric metric that could be monitored by an alarm.
-- **SNS:** SNS delivered email notifications when the 404 alarm threshold was reached and when the EventBridge rule detected an EC2 state change.
-- **EventBridge:** The rule matched EC2 state-change events for both `stopped` and `terminated` states.
-- **AWS Config:** Config rules evaluated resources for the required `project` tag and checked whether EBS volumes were in use.
+### Apache Logs, Metric Filters and Alarms
 
-## Troubleshooting
+I generated a 404 response from the Apache web server and checked CloudWatch Logs to confirm that the request appeared in the access log.
 
-### CloudWatch Alarm Statistic
+![Apache 404 requests in CloudWatch Logs](screenshots/03-404-request-in-cloudwatch-logs.png)
 
-The 404 alarm initially remained in the OK state even after generating multiple 404 responses. I found that the alarm was using the Average statistic instead of Sum. Since the metric filter added a value of `1` for each matching 404 event, changing the statistic to Sum allowed the alarm to count the errors correctly. The alarm then entered the ALARM state and sent the SNS notification.
+I then created a metric filter to count matching 404 events and connected the resulting metric to a CloudWatch alarm. The alarm initially stayed in the OK state even after I generated several errors. When I checked its settings, I found that it was using **Average** rather than **Sum**. The metric filter emitted a value of 1 for each matching event, so changing the statistic to Sum allowed the alarm to count the errors as intended.
 
-### EventBridge Rule Creation
+The alarm eventually entered the ALARM state, and SNS delivered an email notification. The notification showed a datapoint of 7 against the configured threshold of 5.
 
-EventBridge initially failed when I tried to create the rule. The console showed that AWS was attempting to create an IAM role, but the lab environment did not allow that action. Changing the configuration to use the SNS topic without an execution role allowed the rule to be created successfully.
+![SNS notification for the 404 Errors CloudWatch alarm](screenshots/04-cloudwatch-alarm-sns-notification.png)
 
-After the EC2 instance was stopped, EventBridge detected the state change and SNS sent the notification as expected. The instance was later terminated during the lab teardown, which triggered a second notification. This confirmed that the rule was matching both `stopped` and `terminated` states.
+### EventBridge and EC2 State Changes
 
-## Verification
+I created an EventBridge rule named `Instance_Stopped_Terminated` to match EC2 state-change events for instances entering the `stopped` or `terminated` state. During rule creation, the console attempted to create an IAM role, but the lab environment did not allow that action. I changed the target configuration to use the SNS topic without an execution role, which allowed me to create the rule.
 
-The monitoring configuration was tested at several levels:
+After I stopped the EC2 instance, EventBridge detected the state change and SNS delivered the notification.
 
-- CloudWatch Logs recorded the generated 404 request.
-- The 404 metric filter produced a metric that could be used by a CloudWatch alarm.
-- The alarm reached the ALARM state after the configured threshold was exceeded and an SNS email was received.
-- CloudWatch Agent metrics showed disk and memory information from inside the EC2 instance.
-- EventBridge successfully triggered SNS notifications for both stopped and terminated EC2 states.
-- AWS Config evaluated the configured rules and showed compliant and noncompliant resources.
+![SNS notification for the EC2 stopped state](screenshots/07-eventbridge-sns-ec2-stop-notification.png)
 
-## Screenshots
+The instance was later terminated during lab teardown, which triggered another notification. This gave me a chance to see the rule respond to both state changes.
 
-### CloudWatch Agent Configuration
+### AWS Config
 
-![CloudWatch Agent configuration completed successfully](screenshots/01-cloudwatch-agent-configuration.png)
+I added the AWS Config `required-tags` managed rule to check resources for the required `project` tag. I also configured the `ec2-volume-inuse-check` rule for EBS volumes.
 
-The CloudWatch Agent was configured through Systems Manager using the configuration stored in Parameter Store.
+The evaluation results included noncompliant resources. I therefore treat this part of the lab as practice configuring and reviewing compliance rules, not as evidence that every resource passed the checks.
 
-### CloudWatch Alarm and SNS Notification
+## What I Learned
 
-![CloudWatch alarm notification for 404 errors](screenshots/02-cloudwatch-alarm-sns-notification.png)
+The CloudWatch alarm troubleshooting was one of the most useful parts of the lab. The logs were recording the 404 requests, and the metric filter was producing values, but the alarm statistic affected how those values were evaluated. Changing Average to Sum made the alarm behave as expected.
 
-The 404 alarm entered the ALARM state after the threshold was exceeded and SNS delivered the notification by email.
+I also had to work around the EventBridge rule's IAM role creation issue before notifications could be delivered. Once the rule was in place, I could see the EC2 state change arrive through SNS.
 
-### CloudWatch Agent Disk Metrics
-
-![CloudWatch Agent disk metrics](screenshots/03-cwagent-disk-metrics.png)
-
-The CWAgent metrics showed filesystem information collected from inside the EC2 operating system.
-
-### CloudWatch Agent Memory Metrics
-
-![CloudWatch Agent memory metrics](screenshots/04-cwagent-memory-metrics.png)
-
-The memory metric showed the percentage of memory being used by the EC2 host over time.
-
-### EventBridge EC2 State Change Notifications
-
-![EventBridge EC2 state change notification](screenshots/05-eventbridge-state-change-notifications.png)
-
-The EventBridge rule matched EC2 state changes and SNS delivered notifications for both stopped and terminated states.
-
-### AWS Config Rules
-
-![AWS Config rules overview](screenshots/06-aws-config-rules.png)
-
-The AWS Config rules evaluated resources for the required `project` tag and EBS volume usage.
-
-### AWS Config Compliant Resource
-
-![AWS Config required-tags compliant Web Server](screenshots/07-aws-config-compliant-web-server.png)
-
-The Web Server instance was shown as compliant with the required `project` tag.
+The lab also gave me experience with AWS Config managed rules and interpreting compliance results. Adding a rule is only the beginning; the evaluation can still identify resources that need attention.
 
 ## Skills Demonstrated
 
-- Configuring the CloudWatch Agent on an EC2 instance using Systems Manager
-- Using Parameter Store to manage monitoring configuration
-- Collecting and investigating Apache web server logs
-- Creating CloudWatch metric filters and alarms
-- Understanding CloudWatch metric statistics when counting log events
-- Configuring SNS notifications
-- Creating and troubleshooting EventBridge event patterns and targets
-- Monitoring EC2 state changes
-- Using AWS Config rules to evaluate resource configuration
-- Troubleshooting AWS service configuration and permission issues
-- Connecting logs, metrics, events, and notifications into a monitoring workflow
+- Configuring the CloudWatch Agent using Systems Manager and Parameter Store
+- Collecting and checking Apache web server logs in CloudWatch Logs
+- Creating metric filters and CloudWatch alarms
+- Selecting an appropriate statistic for counting log events
+- Sending alarm and EC2 state-change notifications through SNS
+- Creating and troubleshooting EventBridge rules and targets
+- Using AWS Config managed rules to evaluate resource configuration
+- Interpreting compliant and noncompliant resource results
