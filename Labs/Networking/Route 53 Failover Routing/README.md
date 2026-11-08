@@ -62,11 +62,9 @@ This was **Availability Zone failover within one Region**, not a deployment acro
 
 ## Failover Demonstration
 
-The useful part of this exercise was seeing the change at the website level, rather than only looking at the Route 53 configuration.
+The primary café website was initially served from `44.238.1.18` in `us-west-2a`. When the primary health check changed to **Unhealthy**, Route 53 failed over to the secondary website at `52.41.137.204` in `us-west-2b`.
 
-The primary café website was available at `44.238.1.18`. After the primary health check reported **Unhealthy**, the café page was subsequently available from `52.41.137.204`, the secondary instance in `us-west-2b`.
-
-That sequence showed the purpose of the failover records: Route 53 could stop returning the unhealthy primary endpoint and use the secondary endpoint instead.
+I was able to access the café website through the secondary instance after the primary health check failed. This was the result I was looking for: traffic was directed away from the unhealthy primary endpoint and the secondary endpoint took over.
 
 ## Health Checks and Notifications
 
