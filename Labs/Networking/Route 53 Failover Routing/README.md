@@ -2,74 +2,115 @@
 
 ## Overview
 
-This lab demonstrated DNS failover for a café website hosted on two EC2 web servers in separate Availability Zones within the same AWS Region.
+In this lab, I configured Amazon Route 53 failover routing for a café website hosted on two EC2 instances in separate Availability Zones.
 
-The primary website was hosted at `44.238.1.18` in `us-west-2a`. When its Route 53 health check changed from **Healthy** to **Unhealthy**, the café website was subsequently accessible from the secondary server at `52.41.137.204` in `us-west-2b`.
+The primary website was hosted at `44.238.1.18` in `us-west-2a`, with a secondary website at `52.41.137.204` in `us-west-2b`. I used a Route 53 health check to monitor the primary endpoint and observed what happened when its status changed from **Healthy** to **Unhealthy**.
 
-The exercise demonstrated how Route 53 failover routing can direct DNS responses away from an unhealthy primary endpoint and toward a secondary endpoint.
+The café website subsequently loaded from the secondary endpoint. This gave me a practical look at how Route 53 can use health checks and failover records to direct DNS responses away from an unhealthy primary endpoint.
 
-## Architecture and Service Roles
+## AWS Services and Components Used
 
-- **Amazon Route 53 hosted zone:** stored the DNS records used to route requests to the café website.
-- **Failover routing records:** identified the primary and secondary endpoints for the same DNS name.
-- **Route 53 health check:** monitored the primary website endpoint and reported its health status.
-- **Amazon SNS:** provided the notification topic associated with the primary website health monitoring.
-- **Amazon CloudWatch:** supports alarm and notification workflows for monitored health-check status.
+- Amazon Route 53
+- Amazon EC2
+- Amazon SNS
+- Amazon CloudWatch
+- Route 53 Health Checks
+- Failover Routing Records
+- Availability Zones
 
-The two web servers were deployed in separate Availability Zones, `us-west-2a` and `us-west-2b`, within **US West (Oregon), `us-west-2`**. This was an Availability Zone failover exercise, not a multi-Region deployment.
+## Architecture
 
-## Configuration Context
+Both web servers were deployed in **US West (Oregon), `us-west-2`**, but in different Availability Zones.
 
-The lab instructions called for:
+```text
+                 Café website DNS name
+                          |
+                          v
+                    Amazon Route 53
+                          |
+                 Failover routing records
+                    /             \
+                   /               \
+             PRIMARY             SECONDARY
+                |                    |
+                v                    v
+          Primary EC2           Secondary EC2
+          us-west-2a            us-west-2b
+          44.238.1.18           52.41.137.204
+                |
+                v
+        Route 53 health check
+                |
+        Healthy / Unhealthy
+```
 
-- A primary café website endpoint at `44.238.1.18` in `us-west-2a`.
-- A secondary café website endpoint at `52.41.137.204` in `us-west-2b`.
-- Route 53 failover records using PRIMARY and SECONDARY roles.
-- A health check named `Primary-Website-Health` for the primary website.
-- A health-check request path of `/cafe`.
-- An SNS topic named `Primary-Website-Health` for health-related notifications.
+The health check monitored the primary website endpoint. When the primary became unhealthy, the failover configuration allowed Route 53 to use the secondary endpoint.
 
-The captured health-check creation form does not visibly establish the saved request path. The captured secondary-record form also appears to show the primary health-check ID selected, whereas the lab instructions say to leave the secondary record's health-check association blank. The final saved record configuration was not captured, so these two settings are not presented here as verified final-state facts.
+This was **Availability Zone failover within one Region**, not a deployment across two AWS Regions.
+
+## Project Workflow
+
+1. Worked with the café website hosted on the primary EC2 instance in `us-west-2a`.
+2. Identified the secondary café website hosted in `us-west-2b`.
+3. Created a Route 53 hosted zone and configured failover routing records for the café website.
+4. Created the `Primary-Website-Health` health check for the primary endpoint.
+5. Configured the SNS topic used for health-related notifications.
+6. Confirmed the SNS email subscription through the confirmation link sent by AWS Notifications.
+7. Tested the primary endpoint and observed its health-check status.
+8. Observed the health check change from **Healthy** to **Unhealthy**.
+9. Refreshed the café website and observed it loading from the secondary endpoint in the other Availability Zone.
 
 ## Failover Demonstration
 
-The screenshots captured the important stages of the exercise:
+The useful part of this exercise was seeing the change at the website level, rather than only looking at the Route 53 configuration.
 
-1. The café website was accessible from the primary endpoint, `44.238.1.18`, in `us-west-2a`.
-2. The primary health check changed from **Healthy** to **Unhealthy**.
-3. The café website was subsequently accessible from the secondary endpoint, `52.41.137.204`, in `us-west-2b`.
+The primary café website was available at `44.238.1.18`. After the primary health check reported **Unhealthy**, the café page was subsequently available from `52.41.137.204`, the secondary instance in `us-west-2b`.
 
-This sequence demonstrates the observed failover behaviour between the two Availability Zones.
+That sequence showed the purpose of the failover records: Route 53 could stop returning the unhealthy primary endpoint and use the secondary endpoint instead.
 
-## Notifications
+## Health Checks and Notifications
 
-The SNS subscription confirmation email for the `Primary-Website-Health` topic was received on **19 August 2026 at 4:38 PM**. I confirmed the subscription using the email link.
+The health check was named `Primary-Website-Health`. The lab instructions specified the `/cafe` request path for the health check, but the captured creation form does not show the path value. I therefore cannot verify the final saved path from the available screenshot.
 
-The lab instructions also expected an alarm notification email with a subject beginning `ALARM: Primary-Website-Health-awsroute53-`. That specific notification email was not recovered, so successful delivery of the alarm email is not claimed as screenshot-verified evidence.
+The captured secondary-record form also appears to show the primary health-check ID selected. The lab instructions say to leave the secondary record's health-check association blank. There is no screenshot of the final saved record, so I have not treated that setting as confirmed.
 
-## Evidence and Verification
+The SNS email subscription confirmation for `Primary-Website-Health` was received on **19 August 2026 at 4:38 PM**, and I confirmed the subscription using the link in the email. The separate alarm notification expected by the lab was not recovered from the inbox, so I have not used it as evidence of successful alarm-email delivery.
 
-The portfolio evidence focuses on the key outcomes rather than documenting every console action:
+## Screenshots
 
-- Primary café website responding from the first Availability Zone.
-- Route 53 health-check status changing from **Healthy** to **Unhealthy**.
-- Café website responding from the secondary Availability Zone.
-- Relevant Route 53 and health-check configuration screens, where the captured details are legible.
+### Primary Café Website
 
-The observed website failover is supported by the captured sequence. The exact saved health-check path and final secondary-record health-check association remain unverified.
+The café page was accessible from the primary endpoint, `44.238.1.18`, in `us-west-2a`.
+
+![Primary café website](screenshots/01-primary-cafe-website.png)
+
+### Primary Health Check
+
+The health-check evidence shows the primary endpoint changing from **Healthy** to **Unhealthy**.
+
+![Primary health check status](screenshots/02-primary-health-check-unhealthy.png)
+
+### Secondary Café Website
+
+After the primary endpoint became unhealthy, the café page loaded from the secondary endpoint, `52.41.137.204`, in `us-west-2b`.
+
+![Secondary café website](screenshots/03-secondary-cafe-website.png)
 
 ## Skills Demonstrated
 
-- Configuring DNS failover routing with Amazon Route 53
-- Understanding PRIMARY and SECONDARY failover record roles
-- Using health checks to evaluate endpoint availability
-- Deploying and comparing web endpoints across Availability Zones
-- Observing DNS failover behaviour when a primary endpoint becomes unhealthy
-- Integrating Amazon SNS into a monitoring and notification workflow
-- Distinguishing Availability Zone resilience from multi-Region architecture
+- Configured DNS failover routing with Amazon Route 53
+- Worked with PRIMARY and SECONDARY failover records
+- Created and monitored a Route 53 health check
+- Used health status to understand endpoint availability
+- Tested website availability across two Availability Zones
+- Integrated Amazon SNS into a notification workflow
+- Distinguished Availability Zone failover from multi-Region deployment
+- Verified failover through the application endpoint, not just the console configuration
 
-## Key Takeaway
+## Key Lessons Learned
 
-This lab demonstrated how Route 53 failover routing can improve application availability by directing DNS queries to a secondary endpoint when the primary endpoint is unhealthy.
+This lab helped connect DNS routing with application availability. A secondary server is useful only when the routing configuration can direct users to it when the primary endpoint is unhealthy.
 
-The practical result was a café website that became accessible from the secondary Availability Zone after the primary health check reported an unhealthy endpoint. The exercise connected DNS routing, endpoint health monitoring, and notification services in a working failover scenario.
+It was also useful to see the difference between deploying resources in separate Availability Zones and deploying across separate AWS Regions. Both can support resilience, but this exercise used two Availability Zones within `us-west-2`.
+
+The clearest evidence was the change from the primary café website to the secondary one after the health check reported an unhealthy endpoint.
