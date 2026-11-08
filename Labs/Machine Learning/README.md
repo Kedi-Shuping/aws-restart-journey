@@ -41,22 +41,6 @@ The stratified split produced three datasets:
 
 I uploaded all three datasets to S3 under the `lab3` prefix, in separate `train`, `validate`, and `test` folders. The SageMaker training job used the training and validation channels. The test dataset was held back for testing and evaluation in a later lab.
 
-## Model Training Configuration
-
-| Setting | Value |
-| --- | --- |
-| Algorithm | XGBoost |
-| Container version | `1.0-1` |
-| Objective | `binary:logistic` |
-| Evaluation metric | `auc` |
-| Training rounds | `42` |
-| Instance type | `ml.m5.4xlarge` |
-| Instance count | `1` |
-
-SageMaker completed the training job successfully. The final resource status was **Completed**.
-
-This confirms that the training job ran to completion. Model performance was not evaluated as part of this lab; the test dataset was reserved for a later exercise.
-
 ## Screenshots
 
 ### 1. Dataset Loading and Encoding
