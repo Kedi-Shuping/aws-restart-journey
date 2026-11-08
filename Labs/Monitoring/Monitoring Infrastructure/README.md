@@ -2,64 +2,88 @@
 
 ## Overview
 
-In this lab, I set up monitoring for an Apache web server running on an EC2 instance. I worked with the CloudWatch Agent, CloudWatch Logs, metric filters and alarms, SNS notifications, EventBridge, and AWS Config.
+In this lab, I set up monitoring for an Apache web server running on an Amazon EC2 instance. I worked with the CloudWatch Agent, Systems Manager, CloudWatch Logs, metric filters and alarms, SNS notifications, EventBridge, and AWS Config.
 
-The lab brought together several ways of keeping track of an environment: looking inside the instance for application and system information, reacting to errors in the web server logs, receiving notifications when an alarm or EC2 state change occurred, and checking resource configuration with AWS Config.
+The exercise covered several layers of monitoring: collecting information from inside the EC2 instance, tracking application errors, responding to alarms and instance state changes, and checking resource configuration against AWS Config rules.
 
 ## AWS Services and Tools Used
 
 - Amazon EC2
 - AWS Systems Manager Run Command
 - AWS Systems Manager Parameter Store
-- Amazon CloudWatch (Agent, Logs, Metrics, Alarms and metric filters)
+- Amazon CloudWatch (Agent, Logs, Metrics, metric filters and alarms)
 - Amazon SNS
 - Amazon EventBridge
 - AWS Config
 - Apache HTTP Server
 
-## Project Workflow
+## CloudWatch Agent and Systems Manager
 
-### CloudWatch Agent and Parameter Store
+I used Systems Manager Run Command to prepare the CloudWatch Agent on the EC2 web server. The command execution completed successfully, and I then stored the agent configuration in Parameter Store using the name `Monitor-Web-Server`.
 
-I used Systems Manager Run Command to prepare the CloudWatch Agent on the EC2 instance. I stored the agent configuration in Parameter Store under the name `Monitor-Web-Server`, then ran the configuration command so the agent could retrieve the parameter and start.
+![CloudWatch Agent Run Command execution](screenshots/01-cloudwatch-agent-installation.png)
+
+I used the Parameter Store configuration to configure the agent and start it on the instance.
 
 ![CloudWatch Agent configured from Parameter Store](screenshots/02-cloudwatch-agent-parameter-configuration.png)
 
-### Apache Logs, Metric Filters and Alarms
+The agent configuration was intended to collect Apache logs and system metrics from the EC2 instance. The captured evidence confirms the configuration was retrieved and the agent started. It does not include separate disk or memory metric screenshots, so I have not included those as demonstrated results here.
 
-I generated a 404 response from the Apache web server and checked CloudWatch Logs to confirm that the request appeared in the access log.
+## CloudWatch Logs, Metric Filters and Alarms
+
+To test log collection, I generated a 404 response from the Apache web server and checked CloudWatch Logs. The matching requests appeared in the `HttpAccessLog` log stream.
 
 ![Apache 404 requests in CloudWatch Logs](screenshots/03-404-request-in-cloudwatch-logs.png)
 
-I then created a metric filter to count matching 404 events and connected the resulting metric to a CloudWatch alarm. The alarm initially stayed in the OK state even after I generated several errors. When I checked its settings, I found that it was using **Average** rather than **Sum**. The metric filter emitted a value of 1 for each matching event, so changing the statistic to Sum allowed the alarm to count the errors as intended.
+I then created a metric filter to count matching 404 events and connected the resulting metric to a CloudWatch alarm. The alarm initially stayed in the OK state even after I generated several errors. When I checked its settings, I found that it was using **Average** rather than **Sum**.
 
-The alarm eventually entered the ALARM state, and SNS delivered an email notification. The notification showed a datapoint of 7 against the configured threshold of 5.
+The metric filter emitted a value of 1 for each matching event, so changing the alarm statistic to Sum allowed it to count the errors as intended. The alarm eventually entered the ALARM state, and SNS delivered an email notification. The notification showed a datapoint of 7.0 against the configured threshold of 5.0.
 
 ![SNS notification for the 404 Errors CloudWatch alarm](screenshots/04-cloudwatch-alarm-sns-notification.png)
 
-### EventBridge and EC2 State Changes
+## EventBridge and EC2 State Changes
 
-I created an EventBridge rule named `Instance_Stopped_Terminated` to match EC2 state-change events for instances entering the `stopped` or `terminated` state. During rule creation, the console attempted to create an IAM role, but the lab environment did not allow that action. I changed the target configuration to use the SNS topic without an execution role, which allowed me to create the rule.
+I created an EventBridge rule named `Instance_Stopped_Terminated` to match EC2 state-change events for instances entering the `stopped` or `terminated` state. The rule was successfully created and enabled.
 
-After I stopped the EC2 instance, EventBridge detected the state change and SNS delivered the notification.
+![EventBridge EC2 state-change rule](screenshots/05-eventbridge-ec2-state-change-rule.png)
+
+During rule creation, the console attempted to create an IAM role, but the lab environment did not allow that action. I changed the target configuration to use the SNS topic without an execution role, which allowed me to create the rule.
+
+After I stopped the EC2 instance, EventBridge detected the state change and SNS delivered the notification. The instance was later terminated during lab teardown, which triggered another notification. This gave me a chance to see the rule respond to both state changes.
 
 ![SNS notification for the EC2 stopped state](screenshots/07-eventbridge-sns-ec2-stop-notification.png)
 
-The instance was later terminated during lab teardown, which triggered another notification. This gave me a chance to see the rule respond to both state changes.
+## AWS Config
 
-### AWS Config
+I added the AWS Config `required-tags` managed rule to check resources for the required `project` tag.
 
-I added the AWS Config `required-tags` managed rule to check resources for the required `project` tag. I also configured the `ec2-volume-inuse-check` rule for EBS volumes.
+![AWS Config required-tags rule added](screenshots/Screenshot%202026-09-04%20230652.png)
 
-The evaluation results included noncompliant resources. I therefore treat this part of the lab as practice configuring and reviewing compliance rules, not as evidence that every resource passed the checks.
+I also worked with the `ec2-volume-inuse-check` rule for EBS volumes. The evaluation results showed noncompliant resources: the captured rules list reported one noncompliant resource for `ec2-volume-inuse-check` and 22 for `required-tags`.
+
+![AWS Config rule evaluation results](screenshots/Screenshot%202026-09-04%20231930.png)
+
+These results were useful because they showed that creating a rule does not automatically make resources compliant. AWS Config evaluates the resources against the rule and reports where they do not meet its requirements. I have kept the results as they appeared rather than presenting the lab as though every resource passed.
+
+## Troubleshooting
+
+### CloudWatch Alarm Statistic
+
+The 404 alarm initially remained in the OK state even after generating multiple 404 responses. I found that the alarm was using the Average statistic instead of Sum. Since the metric filter added a value of 1 for each matching 404 event, changing the statistic to Sum allowed the alarm to count the errors correctly. The alarm then entered the ALARM state and sent the SNS notification.
+
+### EventBridge Rule Creation
+
+EventBridge initially failed when I tried to create the rule. The console showed that AWS was attempting to create an IAM role, but the lab environment did not allow that action. Changing the configuration to use the SNS topic without an execution role allowed the rule to be created successfully.
 
 ## What I Learned
 
-The CloudWatch alarm troubleshooting was one of the most useful parts of the lab. The logs were recording the 404 requests, and the metric filter was producing values, but the alarm statistic affected how those values were evaluated. Changing Average to Sum made the alarm behave as expected.
+This lab gave me a chance to connect logs, metrics, alarms and events rather than treating them as separate AWS features. I could generate an application error, find it in CloudWatch Logs, turn matching log events into a metric, and use that metric to trigger an alarm and an SNS email.
 
-I also had to work around the EventBridge rule's IAM role creation issue before notifications could be delivered. Once the rule was in place, I could see the EC2 state change arrive through SNS.
+The alarm statistic was a particularly useful lesson. The metric filter was producing values, but the alarm's use of Average meant it wasn't counting the errors the way I expected. Changing it to Sum fixed the behaviour.
 
-The lab also gave me experience with AWS Config managed rules and interpreting compliance results. Adding a rule is only the beginning; the evaluation can still identify resources that need attention.
+I also had to work around the EventBridge rule's IAM role creation issue before notifications could be delivered. Once the rule was active, I could see SNS receive notifications for the EC2 instance entering both stopped and terminated states.
+
+Finally, AWS Config gave me a view of resource compliance. The noncompliant results were part of the exercise too: they showed me how Config identifies resources that need attention, not just how to create a rule.
 
 ## Skills Demonstrated
 
