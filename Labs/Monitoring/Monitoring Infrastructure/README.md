@@ -57,11 +57,11 @@ After I stopped the EC2 instance, EventBridge detected the state change and SNS 
 
 I added the AWS Config `required-tags` managed rule to check resources for the required `project` tag.
 
-![AWS Config required-tags rule added](screenshots/Screenshot%202026-09-04%20230652.png)
+![AWS Config required-tags rule added](screenshots/08-aws-config-required-tags-rule.png)
 
 I also worked with the `ec2-volume-inuse-check` rule for EBS volumes. The evaluation results showed noncompliant resources: the captured rules list reported one noncompliant resource for `ec2-volume-inuse-check` and 22 for `required-tags`.
 
-![AWS Config rule evaluation results](screenshots/Screenshot%202026-09-04%20231930.png)
+![AWS Config rule evaluation results](screenshots/09-aws-config-compliance-results.png)
 
 These results were useful because they showed that creating a rule does not automatically make resources compliant. AWS Config evaluates the resources against the rule and reports where they do not meet its requirements. I have kept the results as they appeared rather than presenting the lab as though every resource passed.
 
