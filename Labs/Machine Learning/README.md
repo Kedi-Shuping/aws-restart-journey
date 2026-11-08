@@ -2,7 +2,7 @@
 
 ## Overview
 
-On 30 September 2026, I prepared the UCI Vertebral Column dataset and trained an XGBoost binary classification model using Amazon SageMaker. The lab brought together Python-based data preparation, Amazon S3 storage, and a managed model-training job.
+I prepared the UCI Vertebral Column dataset and trained an XGBoost binary classification model using Amazon SageMaker. The lab brought together Python-based data preparation, Amazon S3 storage, and a managed model-training job.
 
 The dataset contains 310 patient records. Each record has six biomechanical features derived from the shape and orientation of the pelvis and lumbar spine. The target identifies each record as **Normal** or **Abnormal**.
 
