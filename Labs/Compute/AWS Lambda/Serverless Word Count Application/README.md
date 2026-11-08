@@ -80,7 +80,7 @@ The problem was caused by an error in the Lambda function logic while processing
 
 ### Lambda Function Code
 
-![Lambda Function Code](screenshots/02wordcount-lambda-function-code.png)
+![Lambda Function Code](screenshots/02wordcount-lambda-funtion-code.png)
 
 The Lambda function contains the Python code responsible for counting the words in an uploaded text file.
 
