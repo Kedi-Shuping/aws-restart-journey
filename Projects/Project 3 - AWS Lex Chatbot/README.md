@@ -1,43 +1,45 @@
 # Project 3 – AWS Lex Chatbot
 
+*An interactive chatbot built with Amazon Lex, combining a basic conversational experience with an AWS knowledge quiz.*
+
 ## Project Overview
 
-This project was completed as part of the AWS re/Start programme. The objective was to create an interactive chatbot using Amazon Lex.
+This project was completed as part of the AWS re/Start programme. The objective was to build a chatbot using Amazon Lex and demonstrate how it can respond to user input through intents, sample utterances, and configured responses.
 
-The chatbot was developed according to the requirements in the project brief. It includes a basic conversational bot and a knowledge quiz that allows users to answer questions and receive feedback.
+The project follows a two-part brief: first, a basic chatbot; then, an interactive knowledge quiz that uses branching logic to respond to users' answers.
 
-## Project Objectives
-
-- Create a chatbot using Amazon Lex.
-- Configure intents and sample utterances.
-- Create an interactive knowledge quiz based on an AWS topic.
-- Configure responses for correct and incorrect answers.
-- Allow users to continue through the quiz.
-
-## AWS Services
-
-- **Amazon Lex** — used to build and configure the chatbot, define intents and utterances, and manage the conversation flow.
-
-## Implementation
-
-The project consists of two parts:
+## Chatbot Functionality
 
 ### Part 1 – Basic Chatbot
 
-A basic chatbot was created with an intent, sample utterances, and a response.
+The first part introduces the basic conversational flow:
 
-### Part 2 – Interactive Quiz
+- A user enters a topic-related question or request.
+- Amazon Lex matches the input to the configured intent and sample utterances.
+- The chatbot returns the response configured for that intent.
 
-The chatbot was extended to provide an AWS knowledge quiz. It presents questions to the user, processes their answers, and responds according to whether the answer is correct or incorrect.
+### Part 2 – Interactive Knowledge Quiz
 
-## Skills Developed
+The second part extends the chatbot with a knowledge quiz on an AWS topic.
 
-- Amazon Lex configuration
-- Intent and utterance design
+The quiz presents multiple-choice questions and uses branching logic to handle the user's answers. It provides feedback for correct and incorrect responses, then allows the user to retry or continue to the next question.
+
+## How Amazon Lex Is Used
+
+Amazon Lex provides the conversational interface for the chatbot. Intents identify what the user wants to do, sample utterances provide examples of how a user may express that request, and configured responses guide the conversation.
+
+For the quiz, branching logic connects the user's answer to the appropriate feedback and next step in the interaction.
+
+## AWS Service
+
+| AWS service | Role in the project |
+|---|---|
+| **Amazon Lex** | Used to create the chatbot, configure intents and sample utterances, and manage responses and quiz interactions. |
+
+## Skills Demonstrated
+
+- Amazon Lex bot configuration
+- Intent and sample utterance design
 - Conversational flow development
-- Chatbot testing
-- AWS service fundamentals
-
-## Project Outcome
-
-The chatbot was built according to the project brief.
+- Branching logic for quiz responses
+- Testing chatbot interactions
