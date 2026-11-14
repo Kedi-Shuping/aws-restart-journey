@@ -40,4 +40,4 @@ The chatbot was extended to provide an AWS knowledge quiz. It presents questions
 
 ## Project Outcome
 
-The chatbot was built according to the project brief. The remaining task is to prepare the presentation explaining Amazon Lex, the client requirements, the proposed solution, and the technical approach.
+The chatbot was built according to the project brief.
