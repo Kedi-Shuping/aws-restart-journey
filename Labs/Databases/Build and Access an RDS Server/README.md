@@ -4,8 +4,6 @@
 
 In this lab, I set up an Amazon RDS for MySQL database and connected to it from a Linux server running on Amazon EC2. I created a database, built two tables, added records, and used an `INNER JOIN` to bring related information together.
 
-Along the way, I ran into a few problems with the Linux environment, the database client, the connection, and my SQL statements. Working through those errors was just as useful as getting the final query to run.
-
 ## AWS Services and Tools Used
 
 - Amazon RDS for MySQL
@@ -76,3 +74,7 @@ The `INNER JOIN` returned the ten matching records with the requested informatio
 - How to use error messages to narrow down connection, compatibility, and SQL problems.
 - How to create a database, build tables, insert records, and verify the results.
 - How an `INNER JOIN` uses a shared field to combine related records from two tables.
+
+## Challenges Encountered
+
+Along the way, I ran into a few problems with the Linux environment, the database client, the connection, and my SQL statements. Working through those errors was just as valuable as getting the final query to run.
