@@ -4,7 +4,7 @@ This folder contains my database labs completed during the AWS re/Start programm
 
 ## Labs
 
-- [Lab 162 — Build Your DB Server and Interact With Your DB](Lab%20162%20-%20Build%20and%20Access%20an%20RDS%20Server/README.md) — Amazon RDS for MySQL, EC2-based database access, SQL table creation, data validation, joins, and troubleshooting.
+- [Build and Access an RDS Server](Build%20and%20Access%20an%20RDS%20Server/README.md) — setting up an Amazon RDS for MySQL database, connecting from EC2, working with SQL tables, and troubleshooting connection and query problems.
 - [Migrating to Amazon RDS](Migrating%20to%20Amazon%20RDS/README.md) — migrating a local MariaDB database to Amazon RDS for MariaDB.
 
 ## Topics covered
@@ -24,5 +24,5 @@ This folder contains my database labs completed during the AWS re/Start programm
 - AWS services used
 - Database concepts explored
 - Architecture diagrams (where applicable)
-- Selected screenshots
+- Screenshots
 - Key lessons learned
