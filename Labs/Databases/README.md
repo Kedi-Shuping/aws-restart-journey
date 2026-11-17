@@ -6,6 +6,7 @@ This folder contains my database labs completed during the AWS re/Start programm
 
 - [Build and Access an RDS Server](Build%20and%20Access%20an%20RDS%20Server/README.md) — setting up an Amazon RDS for MySQL database, connecting from EC2, working with SQL tables, and troubleshooting connection and query problems.
 - [Migrating to Amazon RDS](Migrating%20to%20Amazon%20RDS/README.md) — migrating a local MariaDB database to Amazon RDS for MariaDB.
+- [Introduction to Amazon DynamoDB](Introduction%20to%20Amazon%20DynamoDB/README.md) — creating a music library table, adding and updating items, and retrieving records using Query and Scan operations.
 
 ## Topics covered
 
