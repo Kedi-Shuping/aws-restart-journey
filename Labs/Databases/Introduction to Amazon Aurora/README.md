@@ -73,7 +73,3 @@ The terminal screenshot shows the query and its two-row result in the Command Ho
 - How to install and use a MariaDB command-line client.
 - How to connect a client to an Aurora writer endpoint.
 - How to select a database, work with a relational table, and filter query results using multiple conditions.
-
-## Evidence Notes
-
-The screenshots document the successful cluster creation and the final SQL query result. The terminal capture does not display the endpoint or connection command, so it is included as evidence of the database work performed in the lab rather than standalone proof of the endpoint value used.
