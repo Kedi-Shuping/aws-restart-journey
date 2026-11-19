@@ -13,4 +13,4 @@ Topics include:
 - Security Groups and Network ACLs
 - DNS and availability
 
-Each lab folder includes an overview, AWS services used, practical evidence, skills demonstrated, and key lessons learned.
+Each lab folder includes an overview, AWS services used, hands-on work, skills demonstrated, and key lessons learned.
