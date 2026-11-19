@@ -43,6 +43,6 @@ I also learned how parameters and intrinsic functions make templates more reusab
 
 - `template.yaml` — the CloudFormation template used for the exercise.
 
-## Evidence
+## Screenshots
 
 The YAML template is included in this folder as the retained technical artefact for the lab. No screenshots were retained for this exercise.
