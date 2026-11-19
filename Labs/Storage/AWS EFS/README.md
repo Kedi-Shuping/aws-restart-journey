@@ -9,7 +9,7 @@ Amazon EFS provides shared file storage that can be accessed by multiple EC2 ins
 ## Training Evidence
 
 **AWS SimuLearn:** File Systems in the Cloud  
-**Completed:** July 7, 2026
+
 
 [View AWS Completion Certificate](../../../Certifications/aws-simulearn-file-systems-in-the-cloud-certificate.pdf)
 
