@@ -118,7 +118,7 @@ The RDS instance reached `available` status and returned its endpoint, confirmin
 
 ![Migrated product data verified in RDS](screenshots/04-rds-database-migration-verified.png)
 
-The `product` table was queried through the RDS endpoint and returned the migrated Café product catalogue. The screenshot has been redacted to remove the lab database password while preserving the connection and query evidence.
+The `product` table was queried through the RDS endpoint and returned the migrated Café product catalogue. The screenshot has been redacted to remove the lab database password while preserving the connection and query output.
 
 ### Application Verification
 
@@ -146,4 +146,4 @@ CloudWatch `DatabaseConnections` was observed with a one-minute period while an 
 - Updating application configuration through Systems Manager Parameter Store
 - Validating application behavior after a database cutover
 - Using CloudWatch metrics for operational monitoring
-- Evidence-based troubleshooting and verification
+- Screenshots-based troubleshooting and verification
