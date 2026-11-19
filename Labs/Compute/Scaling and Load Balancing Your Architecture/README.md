@@ -70,9 +70,9 @@ This demonstrated the relationship between the services: the ALB distributes req
 
 The Auto Scaling group owns and manages the EC2 instances. The target group registers those instances as load-balancer targets and checks their health. CloudWatch metrics inform the target-tracking policy when capacity needs to change.
 
-## Evidence and Verification
+## Verification
 
-The screenshots below show the key configuration and the outcome of the test. They are selected evidence of the working architecture rather than a record of every console action.
+The screenshots below show the key configuration and the outcome of the test. They illustrate the working architecture rather than record every console action.
 
 ### 1. EC2 launch template
 
@@ -94,7 +94,7 @@ The `AlarmHigh` CloudWatch alarm entered the **In alarm** state when CPU utilisa
 
 ### 4. Auto Scaling scale-out
 
-The Auto Scaling Activity History records the desired capacity increasing from **2 to 4** in response to the scaling activity. This is the key evidence that the architecture responded to increased load by adding compute capacity.
+The Auto Scaling Activity History records the desired capacity increasing from **2 to 4** in response to the scaling activity. This is the clear indication that the architecture responded to increased load by adding compute capacity.
 
 ![Auto Scaling Activity History showing desired capacity increasing from two to four](screenshots/04-auto-scaling-scale-out.png)
 
