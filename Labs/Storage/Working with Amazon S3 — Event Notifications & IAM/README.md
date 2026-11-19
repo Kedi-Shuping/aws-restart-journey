@@ -79,7 +79,7 @@ The restriction was verified in the S3 console when `mediacouser` was unable to 
 12. Applied the notification configuration to the S3 bucket using `put-bucket-notification-configuration`.
 13. Verified the complete S3 → SNS → email event path with real object operations.
 14. Tested an unauthorized public ACL operation and received `AccessDenied`.
-15. Ended the temporary lab environment after the evidence was captured.
+15. Ended the temporary lab environment after the screenshots were saved.
 
 ## Event Notification Configuration
 
@@ -184,7 +184,7 @@ Whether a public ACL can actually be applied
 
 The `mediacouser` account could work with permitted objects without receiving bucket administration privileges. The attempted `public-read` ACL was rejected rather than allowing the user to expose the object publicly.
 
-## Portfolio Evidence
+## Screenshots
 
 Six portfolio screenshots were captured during the lab:
 
@@ -195,7 +195,7 @@ Six portfolio screenshots were captured during the lab:
 5. `05-s3-event-notification-object-removed.png` — delivered `ObjectRemoved:Delete` notification.
 6. `06-s3-public-acl-access-denied.png` — denied `PutObjectAcl` request and S3 Block Public Access response.
 
-A separate teardown screenshot was retained as operational evidence showing that the temporary lab resources were terminating.
+A separate teardown screenshot was retained as operational record showing that the temporary lab resources were terminating.
 
 ## Key Lessons
 
@@ -205,7 +205,7 @@ A separate teardown screenshot was retained as operational evidence showing that
 - Event filtering matters: PUT and DELETE generated notifications while GET did not.
 - Successful object access does not imply bucket administration privileges.
 - S3 Block Public Access can prevent public ACLs even when an API request attempts to apply one.
-- Testing both successful and intentionally denied operations provides stronger evidence of a security design than testing only the happy path.
+- Testing both successful and intentionally denied operations demonstrates a security design more clearly than testing only the happy path.
 
 ## Outcome
 
