@@ -28,7 +28,7 @@ This lab demonstrated how Amazon Elastic Block Store (EBS) provides persistent b
 
 Amazon EBS provides block storage designed for use with EC2. Unlike ephemeral instance storage, EBS volumes are persistent independently of the lifecycle of the EC2 instance.
 
-The exercise also demonstrated the relationship between an EBS volume and its snapshot. A snapshot provides a point-in-time backup from which a new EBS volume can be created. In this lab, I tested that recovery path by deleting a file from the original volume and then mounting a new volume created from the snapshot. The terminal evidence shows the file present on the restored volume.
+The exercise also demonstrated the relationship between an EBS volume and its snapshot. A snapshot provides a point-in-time backup from which a new EBS volume can be created. In this lab, I tested that recovery path by deleting a file from the original volume and then mounting a new volume created from the snapshot. The terminal output confirms that the file is present on the restored volume.
 
 On the Linux side, the exercise required creating a filesystem, mounting the block device, configuring `/etc/fstab`, and using standard Linux commands to verify storage and file operations. The EC2 device mappings (`/dev/sdb` and `/dev/sdc`) are distinct from the NVMe device names shown inside the Linux instance.
 
