@@ -45,6 +45,6 @@ It also reinforced that resource names and labels do not determine network behav
 
 - `template.yaml` — the CloudFormation template created for the challenge.
 
-## Evidence
+## Screenshots
 
 The YAML template is included in this folder as the retained technical artefact for the challenge. No screenshots were retained for this exercise.
