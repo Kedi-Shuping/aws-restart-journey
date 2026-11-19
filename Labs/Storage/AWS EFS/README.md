@@ -6,7 +6,7 @@ This project demonstrates how to create and configure Amazon Elastic File System
 
 Amazon EFS provides shared file storage that can be accessed by multiple EC2 instances over the network using NFS. During the exercise, I created an EFS file system, configured mount targets across multiple sites, installed the Amazon EFS utilities on Linux, mounted the file system, and verified access from multiple instances.
 
-## Training Evidence
+## Training Screenshots
 
 **AWS SimuLearn:** File Systems in the Cloud  
 
@@ -40,9 +40,9 @@ Amazon EFS provides shared network file storage that can be accessed by multiple
 
 EFS mount targets provide network access to the file system within the Availability Zones where clients connect. In the exercise, I worked with the Linux side of this setup by installing the EFS utilities, mounting the file system, and validating the mount from the EC2 instances.
 
-## Evidence
+## Screenshots
 
-The screenshots below highlight the key configuration and validation steps from the completed SimuLearn exercise.
+The screenshots below highlight the key configuration and validation steps from the SimuLearn exercise.
 
 ### 1. Amazon EFS File System Created
 
