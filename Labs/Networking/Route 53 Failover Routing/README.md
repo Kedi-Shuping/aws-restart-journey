@@ -72,7 +72,7 @@ The lab instructions specified the `/cafe` request path for the health check, bu
 
 The captured secondary-record form also appears to show the primary health-check ID selected. The lab instructions say to leave the secondary record's health-check association blank. There is no screenshot of the final saved record, so I have not treated that setting as confirmed.
 
-The SNS email subscription confirmation for `Primary-Website-Health` was received on **19 August 2026 at 4:38 PM**, and I confirmed the subscription using the link in the email. The separate alarm notification expected by the lab was not recovered from the inbox, so I have not used it as evidence of successful alarm-email delivery.
+The SNS email subscription confirmation for `Primary-Website-Health` was received on **19 August 2026 at 4:38 PM**, and I confirmed the subscription using the link in the email. The separate alarm notification expected by the lab was not recovered from the inbox, so I have not used it to claim successful alarm-email delivery.
 
 ## Failover Demonstration
 
