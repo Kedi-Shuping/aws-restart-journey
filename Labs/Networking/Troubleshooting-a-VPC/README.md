@@ -184,7 +184,7 @@ Removing the offending NACL rule restored SSH access to the web server.
 
 The Flow Log records captured the relevant CLI Host to Web Server TCP/22 attempts as `REJECT`, supporting the diagnosis of the failed SSH connection.
 
-![VPC Flow Log rejected SSH analysis](screenshots/06-vpc-flow-log-rejected-ssh-evidence.png)
+![VPC Flow Log rejected SSH analysis](screenshots/06-vpc-flow-log-rejected-ssh-analysis.png)
 
 ## Skills Demonstrated
 
