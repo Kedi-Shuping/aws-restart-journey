@@ -51,7 +51,7 @@ When I encounter challenges, I investigate the problem, test different approache
 - [Labs](Labs/) — hands-on exercises organised by topic.
 - [Machine Learning](Labs/Machine%20Learning/) — machine learning concepts, AWS tools, and learning notes.
 - [Projects](Projects/) — larger practical projects.
-- [Certifications](Certifications/) — certification progress and evidence.
+- [Certifications](Certifications/) — certification progress and milestones.
 
 ## Skills Demonstrated
 
