@@ -27,7 +27,7 @@ I used the Parameter Store configuration to configure the agent and start it on 
 
 ![CloudWatch Agent configured from Parameter Store](screenshots/02-cloudwatch-agent-parameter-configuration.png)
 
-The agent configuration was intended to collect Apache logs and system metrics from the EC2 instance. The captured evidence confirms the configuration was retrieved and the agent started. It does not include separate disk or memory metric screenshots, so I have not included those as demonstrated results here.
+The agent configuration was intended to collect Apache logs and system metrics from the EC2 instance. The captured output confirms the configuration was retrieved and the agent started. It does not include separate disk or memory metric screenshots, so I have not included those as demonstrated results here.
 
 ## CloudWatch Logs, Metric Filters and Alarms
 
